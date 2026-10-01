@@ -32,6 +32,14 @@
   padding: 6px 14px;
   font-size: 15px;
   cursor: pointer;
+  transition:
+    opacity 200ms ease,
+    transform 260ms var(--ease-out);
+
+  @starting-style {
+    opacity: 0;
+    transform: translateY(8px);
+  }
 
   & span {
     color: var(--brass);

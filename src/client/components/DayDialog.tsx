@@ -5,6 +5,7 @@ import type { DayEntry, Level } from '../../shared/types.ts';
 import { api, ConflictError } from '../api.ts';
 import { type Cal, fmt, longDate } from '../lib/cal.ts';
 import { backdropDismiss } from '../lib/dialog.ts';
+import { reducedMotion } from '../lib/motion.ts';
 import ui from '../styles/ui.module.css';
 import s from './Dialog.module.css';
 
@@ -53,6 +54,8 @@ export function DayDialog({
   const versions = useRef(new Map<string, string | null>());
   const blocked = useRef(false);
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
+  // Direction of the last prev/next, so the new day slides in from that side.
+  const slideDir = useRef(0);
 
   const flush = useCallback(() => {
     clearTimeout(timer.current);
@@ -101,6 +104,19 @@ export function DayDialog({
       return;
     }
     if (!el.open) el.showModal();
+    if (slideDir.current && !reducedMotion()) {
+      const dx = slideDir.current * 28;
+      for (const part of el.querySelectorAll('[data-slide]')) {
+        part.animate(
+          [
+            { opacity: 0, transform: `translateX(${dx}px)` },
+            { opacity: 1, transform: 'none' },
+          ],
+          { duration: 240, easing: 'cubic-bezier(.2,.8,.2,1)' }
+        );
+      }
+    }
+    slideDir.current = 0;
     setLoaded(null);
     setStatus('idle');
     setConflict(null);
@@ -179,6 +195,7 @@ export function DayDialog({
   const go = (n: number) => {
     if (!date || conflict) return;
     flush();
+    slideDir.current = n;
     onDate(shiftDate(date, n));
   };
 
@@ -245,7 +262,9 @@ export function DayDialog({
       }}
     >
       <div className={s.head}>
-        <h3 id="dayTitle">{date ? longDate(date) : ''}</h3>
+        <h3 id="dayTitle" data-slide>
+          {date ? longDate(date) : ''}
+        </h3>
         <div className={s.nav}>
           <button
             type="button"
@@ -276,7 +295,9 @@ export function DayDialog({
           </button>
         </div>
       </div>
-      <div className={s.sub}>{sub}</div>
+      <div className={s.sub} data-slide>
+        {sub}
+      </div>
       {conflict && (
         <div className={s.conflict} role="alert">
           <p>
@@ -304,7 +325,7 @@ export function DayDialog({
           )}
         </div>
       )}
-      <div className={s.chips}>
+      <div className={s.chips} data-slide>
         {chips.map(a => {
           const on = acts.includes(a);
           return (
@@ -326,6 +347,7 @@ export function DayDialog({
       <textarea
         ref={noteEl}
         className={s.note}
+        data-slide
         placeholder="What happened today? What mattered?"
         aria-label="Note"
         value={loaded ? note : ''}

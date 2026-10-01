@@ -118,8 +118,95 @@ dialog {
   padding: 18px 18px 16px;
   width: min(580px, calc(100vw - 20px));
   max-height: calc(100dvh - 40px);
+}
+
+/* ---------- Motion ---------- */
+
+:root {
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* biome-ignore-start lint/correctness/noUnknownTypeSelector: view-transition pseudo-element arguments are names, not types */
+/* View transitions: a quick crossfade for the page, a longer morph for the
+   element being zoomed into or out of. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 220ms;
+}
+
+::view-transition-group(zoom) {
+  animation-duration: 420ms;
+  animation-timing-function: var(--ease-out);
+}
+
+/* The box morphs between the two shapes; the old snapshot fades out fast so
+   it isn't seen stretched, and the new one fades in, pinned top-left. */
+::view-transition-old(zoom),
+::view-transition-new(zoom) {
+  height: 100%;
+  object-fit: cover;
+  object-position: top left;
+  animation-timing-function: ease;
+}
+
+::view-transition-old(zoom) {
+  animation-duration: 140ms;
+}
+
+::view-transition-new(zoom) {
+  animation-duration: 320ms;
+}
+
+/* biome-ignore-end lint/correctness/noUnknownTypeSelector: end */
+
+/* Dialogs rise and fade in, and fade out on close. */
+dialog {
+  opacity: 0;
+  transform: translateY(10px) scale(0.985);
+  transition:
+    opacity 180ms ease,
+    transform 220ms var(--ease-out),
+    overlay 220ms allow-discrete,
+    display 220ms allow-discrete;
+
+  &[open] {
+    opacity: 1;
+    transform: none;
+  }
 
   &::backdrop {
+    background: transparent;
+    transition:
+      background-color 220ms ease,
+      overlay 220ms allow-discrete,
+      display 220ms allow-discrete;
+  }
+
+  &[open]::backdrop {
     background: var(--backdrop);
   }
 }
+
+@starting-style {
+  dialog[open] {
+    opacity: 0;
+    transform: translateY(10px) scale(0.985);
+  }
+
+  dialog[open]::backdrop {
+    background: transparent;
+  }
+}
+
+/* biome-ignore-start lint/complexity/noImportantStyles: reduced motion must beat every component rule */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after,
+  ::backdrop {
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
+    transition-duration: 0s !important;
+  }
+}
+/* biome-ignore-end lint/complexity/noImportantStyles: end */

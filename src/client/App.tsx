@@ -31,6 +31,7 @@ import {
 } from './components/WeeksSection.tsx';
 import { YearSection } from './components/YearSection.tsx';
 import { type Days, makeCal, monthCounts } from './lib/cal.ts';
+import { pulse, transition } from './lib/motion.ts';
 import { weekCounts, weekOf } from './lib/weeks.ts';
 import ui from './styles/ui.module.css';
 
@@ -54,6 +55,19 @@ const readPerRow = (): PerRow => {
   } catch {}
   return matchMedia('(max-width: 520px)').matches ? 26 : 52;
 };
+
+const INTRO_KEY = 'lifecal:introShown';
+/** The life grid fills in on the first open of each day, not every load. */
+function takeIntro(): boolean {
+  try {
+    const today = todayKey();
+    if (localStorage.getItem(INTRO_KEY) === today) return false;
+    localStorage.setItem(INTRO_KEY, today);
+    return true;
+  } catch {
+    return false;
+  }
+}
 
 const LENS_KEY = 'lifecal:lens';
 const readLens = () => {
@@ -91,6 +105,9 @@ export function App() {
   const [perRow, setPerRowState] = useState<PerRow>(readPerRow);
   const { msg, toast } = useToast();
   const headerRef = useRef<HTMLElement>(null);
+  // Decided once per page load; only the first Life render plays it.
+  const [introPending] = useState(takeIntro);
+  const introSeq = useRef<number | null>(null);
 
   const cal = useMemo(
     () => (settings ? makeCal(settings, today) : null),
@@ -215,17 +232,58 @@ export function App() {
     return { counts: weekCounts(cal, Object.keys(shown)), marks };
   }, [cal, shown]);
 
+  const levelRef = useRef(view.level);
+  levelRef.current = view.level;
+
+  // Zooming morphs the thing you came from into the thing it opens (and back).
   const navigate = useCallback((level: ViewLevel, f?: Partial<Focus>) => {
-    if (f) focus.current = { ...focus.current, ...f };
-    setAway(null);
-    setView(v => ({ level, seq: v.seq + 1 }));
+    const fromLevel = levelRef.current;
+    const next = f ? { ...focus.current, ...f } : focus.current;
+    const { y, m } = next;
+    const tile = `main button[data-y="${y}"]`;
+    const yearSec = `main section[data-y="${y}"]:not([data-m]):not([data-decade])`;
+    const mo = `main [data-mo="${y}-${m}"]`;
+    const monthSec = `main section[data-y="${y}"][data-m="${m}"]`;
+    const pairs: Partial<Record<string, [string, string]>> = {
+      'life>year': [tile, yearSec],
+      'life>month': [tile, monthSec],
+      'year>month': [mo, monthSec],
+      'month>year': [monthSec, mo],
+      'year>life': [yearSec, tile],
+      'month>life': [monthSec, tile],
+    };
+    const pair = pairs[`${fromLevel}>${level}`];
+    transition(
+      () => {
+        focus.current = next;
+        setAway(null);
+        setView(v => ({ level, seq: v.seq + 1 }));
+      },
+      pair && (() => document.querySelector(pair[0])),
+      pair && (() => document.querySelector(pair[1]))
+    );
   }, []);
 
   const goToday = useCallback(() => {
-    setToday(todayKey());
-    focus.current = todayFocus();
-    setAway(null);
-    setView(v => ({ ...v, seq: v.seq + 1 }));
+    transition(() => {
+      setToday(todayKey());
+      focus.current = todayFocus();
+      setAway(null);
+      setView(v => ({ ...v, seq: v.seq + 1 }));
+    });
+  }, []);
+
+  // Days saved while the editor was open pop once it closes.
+  const changed = useRef(new Set<string>());
+  const onDayDate = useCallback((date: string | null) => {
+    if (date === null && changed.current.size) {
+      const sel = [...changed.current]
+        .map(d => `main [data-k="${d}"]`)
+        .join(',');
+      changed.current.clear();
+      requestAnimationFrame(() => pulse(sel));
+    }
+    setOpenDay(date);
   }, []);
 
   const writeToday = useCallback(() => {
@@ -271,6 +329,7 @@ export function App() {
   );
 
   const onSaved = useCallback((date: string, lv: Level, acts: string[]) => {
+    changed.current.add(date);
     setDays(d => {
       if ((d[date] ?? 0) === lv) return d;
       const next = { ...d };
@@ -359,6 +418,7 @@ export function App() {
       </div>
     );
   } else if (cal) {
+    introSeq.current ??= view.seq;
     // Keep focus inside the life being shown.
     const f = focus.current;
     if (f.y < cal.by || (f.y === cal.by && f.m < cal.bm))
@@ -377,6 +437,7 @@ export function App() {
           focusYear={y}
           onYear={onYear}
           onEditLife={() => setDialog('eras')}
+          intro={introPending && introSeq.current === view.seq}
         />
       );
     } else if (view.level === 'weeks') {
@@ -388,6 +449,7 @@ export function App() {
           count={Math.floor(cal.span / 10) + 1}
           anchor={Math.floor(focusAge / 10)}
           homeIndex={Math.floor(todayAge / 10)}
+          anchorSelector={`[data-age="${focusAge}"]`}
           onAway={setAway}
           headerRef={headerRef}
           onFocus={onFocusSection}
@@ -481,7 +543,7 @@ export function App() {
           date={openDay}
           cal={cal}
           activities={settings.activities}
-          onDate={setOpenDay}
+          onDate={onDayDate}
           onSaved={onSaved}
           toast={toast}
         />

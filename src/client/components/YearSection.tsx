@@ -41,6 +41,7 @@ export const YearSection = memo(function YearSection({
         <span
           key={d}
           className={cellClass(key, cal, days)}
+          data-k={key}
           title={marks?.join(', ')}
           style={
             d === 1 ? { gridColumnStart: weekday(y, m, 1) + 1 } : undefined
@@ -53,6 +54,7 @@ export const YearSection = memo(function YearSection({
         key={m}
         type="button"
         className={s.mo}
+        data-mo={`${y}-${m}`}
         aria-label={`${MONTHS[m]} ${y}`}
         onClick={() => onMonth(y, m)}
       >

@@ -1,4 +1,6 @@
 .bar {
+  /* Its own layer, so view transitions leave the header still. */
+  view-transition-name: header;
   position: sticky;
   top: env(safe-area-inset-top, 0px);
   z-index: 5;
@@ -106,6 +108,13 @@
 }
 
 .menu {
+  opacity: 0;
+  transform: translateY(-6px);
+  transition:
+    opacity 160ms ease,
+    transform 200ms var(--ease-out),
+    overlay 200ms allow-discrete,
+    display 200ms allow-discrete;
   position: fixed;
   inset: auto;
   top: calc(var(--hdr, 64px) + env(safe-area-inset-top, 0px) + 4px);
@@ -122,6 +131,13 @@
   &:popover-open {
     display: flex;
     flex-direction: column;
+    opacity: 1;
+    transform: none;
+
+    @starting-style {
+      opacity: 0;
+      transform: translateY(-6px);
+    }
   }
 
   & > button {

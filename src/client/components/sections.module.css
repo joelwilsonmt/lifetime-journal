@@ -70,6 +70,9 @@
     border-radius: 2px;
     background: var(--cell-bg, var(--lived));
     box-shadow: var(--cell-ring, none);
+    transition:
+      background-color 450ms ease,
+      box-shadow 450ms ease;
   }
 }
 
@@ -109,6 +112,10 @@
   background: var(--cell-bg, var(--lived));
   box-shadow: var(--cell-ring, none);
   color: var(--cell-fg, var(--ink));
+  transition:
+    background-color 450ms ease,
+    box-shadow 450ms ease,
+    color 450ms ease;
   cursor: pointer;
   text-align: left;
   padding: 5px 7px;

@@ -11,9 +11,20 @@ interface Props {
   focusYear: number;
   onYear: (y: number) => void;
   onEditLife: () => void;
+  /** Play the fill-in animation (first open of the day). */
+  intro?: boolean;
 }
 
-export function LifeView({ cal, days, focusYear, onYear, onEditLife }: Props) {
+export function LifeView({
+  cal,
+  days,
+  focusYear,
+  onYear,
+  onEditLife,
+  intro = false,
+}: Props) {
+  // Stagger from a few rows above today, so the cascade starts on screen.
+  const introStart = Math.max(0, cal.ty - cal.by - 30);
   const ref = useRef<HTMLDivElement>(null);
   const counts = useMemo(() => monthCounts(days), [days]);
   const birthMonth = cal.birth.slice(0, 7);
@@ -69,6 +80,11 @@ export function LifeView({ cal, days, focusYear, onYear, onEditLife }: Props) {
         className={`${s.tile} ${cls}`}
         data-y={y}
         aria-label={`${y}, age ${age}${notes ? `. ${notes}` : ''}`}
+        style={
+          intro
+            ? ({ '--i': Math.max(0, age - introStart) } as CSSProperties)
+            : undefined
+        }
         title={notes || undefined}
         onClick={() => onYear(y)}
       >
@@ -117,7 +133,7 @@ export function LifeView({ cal, days, focusYear, onYear, onEditLife }: Props) {
             : 'Add eras and milestones'}
         </button>
       </div>
-      <div className={s.life} ref={ref}>
+      <div className={`${s.life} ${intro ? s.intro : ''}`} ref={ref}>
         {items}
       </div>
     </>

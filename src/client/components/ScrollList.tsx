@@ -22,6 +22,8 @@ interface Props {
   /** Which way the home section lies once it's mostly out of view. */
   onAway: (away: Away) => void;
   headerRef: RefObject<HTMLElement | null>;
+  /** Scroll to this element inside the anchor section instead of its top. */
+  anchorSelector?: string;
 }
 
 const APPEND_STEP = 3;
@@ -40,6 +42,7 @@ export function ScrollList({
   homeIndex,
   onAway,
   headerRef,
+  anchorSelector,
 }: Props) {
   const start = Math.max(0, Math.min(count - 1, anchor));
   const [win, setWin] = useState(() => ({
@@ -86,7 +89,10 @@ export function ScrollList({
     const list = listRef.current;
     if (!anchored.current) {
       anchored.current = true;
-      list?.children[start - win.lo]?.scrollIntoView({ block: 'start' });
+      const section = list?.children[start - win.lo];
+      const target =
+        (anchorSelector && section?.querySelector(anchorSelector)) || section;
+      target?.scrollIntoView({ block: 'start' });
     } else if (prependFrom.current !== null) {
       window.scrollBy(
         0,
@@ -96,7 +102,7 @@ export function ScrollList({
     }
     const id = requestAnimationFrame(check);
     return () => cancelAnimationFrame(id);
-  }, [win, start, check]);
+  }, [win, start, check, anchorSelector]);
 
   useEffect(() => {
     let ticking = false;

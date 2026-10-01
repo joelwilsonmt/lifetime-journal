@@ -82,6 +82,9 @@
     display: block;
     background: var(--lived);
     height: var(--h, 10%);
+    transition:
+      height 500ms var(--ease-out),
+      background-color 450ms ease;
 
     &.on {
       background: var(--f3);
@@ -154,5 +157,68 @@
     height: 6px;
     border-radius: 50%;
     background: var(--brass);
+  }
+}
+
+/* First open of the day: the years fill in, then today's tile rings once. */
+.intro {
+  --step: 16ms;
+
+  & .tile {
+    animation: tile-in 420ms var(--ease-out) both;
+    animation-delay: calc(var(--i, 0) * var(--step));
+  }
+
+  & .bars i:not(.nb) {
+    transform-origin: bottom;
+    animation: grow 600ms var(--ease-out) both;
+    animation-delay: calc(var(--i, 0) * var(--step) + 180ms);
+  }
+
+  & .eras i {
+    transform-origin: left;
+    animation: sweep 700ms var(--ease-out) both;
+    animation-delay: calc(var(--i, 0) * var(--step) + 120ms);
+  }
+
+  & .now {
+    animation:
+      tile-in 420ms var(--ease-out) both,
+      ring 1400ms ease-out both;
+    animation-delay:
+      calc(var(--i, 0) * var(--step)), calc(var(--i, 0) * var(--step) + 500ms);
+  }
+}
+
+@keyframes tile-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+@keyframes grow {
+  from {
+    transform: scaleY(0);
+  }
+}
+
+@keyframes sweep {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+@keyframes ring {
+  from {
+    box-shadow:
+      inset 0 0 0 1px var(--brass),
+      0 0 0 0 color-mix(in srgb, var(--brass) 55%, transparent);
+  }
+
+  to {
+    box-shadow:
+      inset 0 0 0 1px var(--brass),
+      0 0 0 12px transparent;
   }
 }

@@ -50,6 +50,7 @@
 }
 
 .ageRow {
+  scroll-margin-top: calc(var(--hdr, 64px) + 4px);
   display: grid;
   grid-template-columns: 2em minmax(0, 1fr);
   align-items: start;
@@ -84,6 +85,7 @@
   border-radius: 2px;
   background: var(--cell-bg, var(--lived));
   box-shadow: var(--cell-ring, none);
+  transition: background-color 450ms ease;
   cursor: pointer;
 
   &:hover {

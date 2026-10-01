@@ -41,6 +41,7 @@ export const MonthSection = memo(function MonthSection({
         key={d}
         type="button"
         className={`${s.day} ${cellClass(key, cal, days)}`}
+        data-k={key}
         style={d === 1 ? { gridColumnStart: weekday(y, m, 1) + 1 } : undefined}
         aria-label={`${longDate(key)}${marks ? `. ${marks.join(', ')}` : ''}`}
         onClick={() => onDay(key)}
