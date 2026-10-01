@@ -1,0 +1,158 @@
+.life {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(76px, 1fr));
+  gap: 8px;
+
+  @media (max-width: 520px) {
+    grid-template-columns: repeat(5, 1fr);
+    gap: 6px;
+  }
+}
+
+.decade {
+  grid-column: 1 / -1;
+  font-size: 14px;
+  color: var(--muted);
+  margin: 10px 0 -2px;
+  font-style: italic;
+
+  &:first-child {
+    margin-top: 0;
+  }
+}
+
+.tile {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--rule);
+  background: none;
+  border-radius: 6px;
+  padding: 8px 8px 7px;
+  text-align: left;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+
+  &:hover {
+    background: var(--hover);
+  }
+
+  &.future {
+    border-style: dashed;
+    color: var(--muted);
+  }
+
+  &.now {
+    border-color: var(--brass);
+    box-shadow: inset 0 0 0 1px var(--brass);
+  }
+
+  @media (max-width: 520px) {
+    padding: 6px 6px 5px;
+  }
+}
+
+.yr {
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+
+  @media (max-width: 520px) {
+    font-size: 15px;
+  }
+}
+
+.age {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.2;
+}
+
+.bars {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 1px;
+  height: 22px;
+  align-items: end;
+  margin-top: 5px;
+
+  & i {
+    display: block;
+    background: var(--lived);
+    height: var(--h, 10%);
+
+    &.on {
+      background: var(--f3);
+    }
+
+    &.nb {
+      background: none;
+      height: 10%;
+      border-bottom: 1px dotted var(--rule);
+    }
+  }
+}
+
+/* Era strips across the top edge of a tile, positioned by date within the year. */
+.eras {
+  position: absolute;
+  inset: 0 0 auto;
+  display: grid;
+  gap: 1px;
+
+  & i {
+    position: relative;
+    display: block;
+    height: 3px;
+  }
+}
+
+.mark {
+  position: absolute;
+  top: 7px;
+  right: 7px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--brass);
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 16px;
+  margin: 0 0 14px;
+  font-size: 14px;
+
+  & button {
+    font-size: 14px;
+    padding: 0;
+  }
+}
+
+.key {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  & i {
+    width: 14px;
+    height: 4px;
+    border-radius: 2px;
+  }
+
+  & small {
+    color: var(--muted);
+    font-size: 13px;
+  }
+
+  & .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--brass);
+  }
+}

@@ -1,0 +1,212 @@
+.bar {
+  position: sticky;
+  top: env(safe-area-inset-top, 0px);
+  z-index: 5;
+  background: var(--paper);
+  border-bottom: 1px solid var(--rule);
+}
+
+.inner {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 10px 16px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 14px;
+}
+
+.stat {
+  flex: 1 1 260px;
+  font-size: 15px;
+  color: var(--muted);
+  line-height: 1.35;
+
+  & b {
+    color: var(--ink);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+
+  & > .write {
+    padding: 4px 14px;
+    font-size: 15px;
+  }
+}
+
+.seg {
+  display: inline-flex;
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  padding: 2px;
+
+  & button {
+    border: 0;
+    background: none;
+    padding: 4px 12px;
+    border-radius: 999px;
+    cursor: pointer;
+    font-size: 15px;
+
+    &[aria-pressed="true"] {
+      background: var(--ink);
+      color: var(--paper);
+    }
+
+    &:hover:not([aria-pressed="true"]) {
+      background: var(--hover);
+    }
+  }
+}
+
+.lens {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-left: 8px;
+  white-space: nowrap;
+
+  & select {
+    font: inherit;
+    font-size: 15px;
+    color: var(--ink);
+    background: none;
+    border: 0;
+    border-bottom: 1px dotted var(--muted);
+    padding: 0 2px;
+    cursor: pointer;
+  }
+}
+
+/* Wide-only and phone-only pieces. */
+.wide {
+  display: contents;
+}
+
+.narrowInline,
+.menuBtn {
+  display: none;
+}
+
+.menuBtn svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  vertical-align: -3px;
+}
+
+.menu {
+  position: fixed;
+  inset: auto;
+  top: calc(var(--hdr, 64px) + env(safe-area-inset-top, 0px) + 4px);
+  right: 8px;
+  margin: 0;
+  width: min(300px, calc(100vw - 16px));
+  padding: 8px;
+  border: 1px solid var(--rule);
+  border-radius: 12px;
+  background: var(--paper);
+  color: var(--ink);
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.18);
+
+  &:popover-open {
+    display: flex;
+    flex-direction: column;
+  }
+
+  & > button {
+    border: 0;
+    background: none;
+    text-align: left;
+    padding: 10px 12px;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+
+    &:hover,
+    &:focus-visible {
+      background: var(--hover);
+    }
+  }
+
+  & .lens {
+    margin: 0 0 4px;
+    padding: 6px 12px 10px;
+    border-bottom: 1px solid var(--rule);
+    font-size: 15px;
+    color: var(--muted);
+  }
+}
+
+.menuStat {
+  margin: 4px 12px 8px;
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--muted);
+
+  & b {
+    color: var(--ink);
+    font-weight: 600;
+  }
+}
+
+/* Phones: one compact bar, everything else in the menu. */
+@media (max-width: 520px) {
+  .inner {
+    padding: 6px 12px 8px;
+    gap: 4px 8px;
+  }
+
+  .stat {
+    font-size: 13px;
+    flex-basis: 100%;
+  }
+
+  .wide,
+  .wideInline {
+    display: none;
+  }
+
+  .narrowInline {
+    display: inline;
+  }
+
+  .menuBtn {
+    display: inline-block;
+  }
+
+  .controls {
+    gap: 6px;
+    flex-wrap: nowrap;
+    width: 100%;
+
+    & button {
+      flex: none;
+      font-size: 14px;
+      padding: 4px 10px;
+    }
+
+    & > .write {
+      padding: 4px 12px;
+    }
+
+    & > .menuBtn {
+      margin-left: auto;
+      padding: 4px 9px;
+    }
+  }
+
+  .seg button {
+    padding: 4px 8px;
+  }
+}

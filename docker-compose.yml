@@ -1,0 +1,17 @@
+services:
+  lifetime-calendar:
+    build:
+      context: .
+      args:
+        APP_UID: ${APP_UID:-1000}
+        APP_GID: ${APP_GID:-1000}
+    image: lifetime-calendar:latest
+    container_name: lifetime-calendar
+    restart: unless-stopped
+    # Bind to the host's Tailscale IP (or leave on 127.0.0.1 behind
+    # `tailscale serve`). Never 0.0.0.0 on a publicly reachable host.
+    ports:
+      - "${BIND_ADDR:-127.0.0.1}:${HOST_PORT:-3000}:3000"
+    volumes:
+      - ./data:/data
+    init: true

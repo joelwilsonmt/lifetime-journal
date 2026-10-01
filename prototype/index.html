@@ -1,0 +1,565 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Lifetime calendar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#EEF0EC; --ink:#1E2428; --muted:#66706B; --rule:#CDD3CC; --hover:#E2E6E0;
+  --lived:#D3D9D2; --field:#F7F8F5;
+  --f1:#B9D1C4; --f2:#7FAE98; --f3:#437D66; --f4:#22523F; --onfill:#F4F7F2;
+  --brass:#A87A1E;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#141819; --ink:#E2E6E1; --muted:#8C9691; --rule:#2C3436; --hover:#1E2426;
+    --lived:#252C2E; --field:#1A1F20;
+    --f1:#23443A; --f2:#2F6A53; --f3:#4C9878; --f4:#8BD0B0; --onfill:#0F1413;
+    --brass:#D6A947;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#141819; --ink:#E2E6E1; --muted:#8C9691; --rule:#2C3436; --hover:#1E2426;
+  --lived:#252C2E; --field:#1A1F20;
+  --f1:#23443A; --f2:#2F6A53; --f3:#4C9878; --f4:#8BD0B0; --onfill:#0F1413;
+  --brass:#D6A947;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--paper);color:var(--ink);
+  font-family:Spectral,Georgia,"Times New Roman",serif;font-size:17px;line-height:1.5;
+  overflow-anchor:none;-webkit-text-size-adjust:100%}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--brass);outline-offset:2px}
+
+/* Header */
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--paper);
+  border-bottom:1px solid var(--rule)}
+.bar-inner{max-width:980px;margin:0 auto;padding:10px 16px;display:flex;flex-wrap:wrap;
+  align-items:center;gap:8px 14px}
+.stat{flex:1 1 260px;font-size:15px;color:var(--muted);line-height:1.35}
+.stat b{color:var(--ink);font-weight:600;font-variant-numeric:tabular-nums}
+.controls{display:flex;gap:8px;align-items:center}
+.seg{display:inline-flex;border:1px solid var(--rule);border-radius:999px;padding:2px}
+.seg button{border:0;background:none;padding:4px 12px;border-radius:999px;cursor:pointer;font-size:15px}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.plain{border:1px solid var(--rule);background:none;border-radius:999px;padding:4px 12px;
+  cursor:pointer;font-size:15px}
+.plain:hover,.seg button:hover:not([aria-pressed="true"]){background:var(--hover)}
+
+main{max-width:980px;margin:0 auto;padding:16px 16px 48px}
+
+/* Life view */
+.life{display:grid;grid-template-columns:repeat(auto-fill,minmax(76px,1fr));gap:8px}
+.tile{border:1px solid var(--rule);background:none;border-radius:6px;padding:8px 8px 7px;
+  text-align:left;cursor:pointer;display:flex;flex-direction:column;gap:2px}
+.tile:hover{background:var(--hover)}
+.tile .yr{font-size:18px;font-weight:500;line-height:1.1;font-variant-numeric:tabular-nums}
+.tile .age{font-size:12px;color:var(--muted);line-height:1.2}
+.bars{display:grid;grid-template-columns:repeat(12,1fr);gap:1px;height:22px;align-items:end;margin-top:5px}
+.bars i{display:block;background:var(--lived);height:10%}
+.bars i.on{background:var(--f3)}
+.bars i.nb{background:none;border-bottom:1px dotted var(--rule)}
+.tile.future{border-style:dashed;color:var(--muted)}
+.tile.now{border-color:var(--brass);box-shadow:inset 0 0 0 1px var(--brass)}
+.decade{grid-column:1/-1;font-size:14px;color:var(--muted);margin:10px 0 -2px;font-style:italic}
+.decade:first-child{margin-top:0}
+
+/* Year view */
+section{scroll-margin-top:calc(var(--hdr,64px) + 4px)}
+.year{padding:14px 0 26px;border-top:1px solid var(--rule)}
+h2{font-weight:500;margin:0 0 12px;display:flex;gap:12px;align-items:baseline;line-height:1.1}
+.year h2{font-size:30px}
+h2 small{font-size:15px;color:var(--muted);font-weight:400}
+.months{display:grid;grid-template-columns:repeat(auto-fill,minmax(128px,1fr));gap:16px 20px}
+.mo{border:0;background:none;padding:6px;margin:-6px;border-radius:6px;cursor:pointer;text-align:left}
+.mo:hover{background:var(--hover)}
+.mo .lbl{font-size:14px;color:var(--muted);margin-bottom:4px}
+.mini{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+.mini span{aspect-ratio:1;border-radius:2px;background:var(--lived)}
+
+/* Shared day states */
+.b{visibility:hidden}
+.fut{background:transparent!important;box-shadow:inset 0 0 0 1px var(--rule)}
+.pre{background:transparent!important;opacity:.35;box-shadow:inset 0 0 0 1px var(--rule)}
+.l1{background:var(--f1)!important}
+.l2{background:var(--f2)!important}
+.l3{background:var(--f3)!important;color:var(--onfill)!important}
+.l4{background:var(--f4)!important;color:var(--onfill)!important}
+.td{outline:2px solid var(--brass);outline-offset:1px}
+
+/* Month view */
+.month{padding:14px 0 28px;border-top:1px solid var(--rule);max-width:640px}
+.month h2{font-size:26px}
+.days{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.wd{font-size:13px;color:var(--muted);text-align:center;padding-bottom:2px}
+.day{border:0;border-radius:6px;aspect-ratio:1/0.85;min-height:40px;background:var(--lived);
+  cursor:pointer;text-align:left;vertical-align:top;padding:5px 7px;font-size:15px;
+  display:flex;align-items:flex-start;font-variant-numeric:tabular-nums}
+.day:hover{filter:brightness(.96)}
+.day.fut{color:var(--muted)}
+
+.empty{max-width:520px;margin:12vh auto;text-align:center}
+.empty p{font-size:20px;margin:0 0 16px}
+
+/* Dialogs */
+dialog{border:1px solid var(--rule);border-radius:12px;background:var(--paper);color:var(--ink);
+  padding:18px 18px 16px;width:min(580px,calc(100vw - 20px));max-height:calc(100dvh - 40px)}
+dialog::backdrop{background:rgba(10,14,14,.45)}
+.dhead{display:flex;align-items:flex-start;gap:8px}
+.dhead h3{flex:1;margin:0;font-size:22px;font-weight:500;line-height:1.2}
+.dsub{color:var(--muted);font-size:14px;margin:4px 0 12px}
+.nav{display:flex;gap:4px}
+.icon{border:1px solid var(--rule);background:none;border-radius:8px;width:36px;height:34px;cursor:pointer;font-size:18px;line-height:1}
+.icon:hover{background:var(--hover)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.chip{border:1px solid var(--rule);background:none;border-radius:999px;padding:3px 12px;cursor:pointer;font-size:15px}
+.chip[aria-pressed="true"]{background:var(--f3);border-color:var(--f3);color:var(--onfill)}
+textarea,input{font:inherit;color:var(--ink);background:var(--field);border:1px solid var(--rule);border-radius:8px;padding:10px 12px;width:100%}
+textarea{min-height:34vh;resize:vertical;line-height:1.6}
+.row{display:flex;gap:8px;justify-content:space-between;align-items:center;margin-top:12px;flex-wrap:wrap}
+.primary{background:var(--ink);color:var(--paper);border:0;border-radius:999px;padding:6px 18px;cursor:pointer}
+.quiet{background:none;border:0;color:var(--muted);cursor:pointer;padding:6px 4px;text-decoration:underline;text-underline-offset:3px}
+label{display:block;font-size:15px;color:var(--muted);margin:12px 0 4px}
+.hint{font-size:14px;color:var(--muted);margin:14px 0 0}
+.toast{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);
+  background:var(--ink);color:var(--paper);padding:8px 16px;border-radius:999px;font-size:15px;
+  opacity:0;pointer-events:none;transition:opacity .2s;z-index:20}
+.toast.show{opacity:1}
+@media (max-width:520px){
+  .months{grid-template-columns:repeat(3,1fr);gap:12px 12px}
+  .life{grid-template-columns:repeat(5,1fr);gap:6px}
+  .tile{padding:6px 6px 5px}
+  .tile .yr{font-size:15px}
+  .days{gap:4px}
+  .day{font-size:14px;padding:4px 5px}
+}
+@media (prefers-reduced-motion: reduce){.toast{transition:none}}
+</style>
+</head>
+<body>
+<header class="bar" id="bar">
+  <div class="bar-inner">
+    <div class="stat" id="stat">Your years, one day at a time.</div>
+    <div class="controls">
+      <div class="seg" role="group" aria-label="Zoom level">
+        <button data-lv="life" aria-pressed="true">Life</button>
+        <button data-lv="year" aria-pressed="false">Year</button>
+        <button data-lv="month" aria-pressed="false">Month</button>
+      </div>
+      <button class="plain" id="todayBtn">Today</button>
+      <button class="plain" id="setBtn" aria-label="Settings">Settings</button>
+    </div>
+  </div>
+</header>
+<main id="main"></main>
+
+<dialog id="dayDlg" aria-labelledby="dayTitle">
+  <div class="dhead">
+    <h3 id="dayTitle"></h3>
+    <div class="nav">
+      <button class="icon" id="prevDay" aria-label="Previous day">‹</button>
+      <button class="icon" id="nextDay" aria-label="Next day">›</button>
+    </div>
+  </div>
+  <div class="dsub" id="daySub"></div>
+  <div class="chips" id="chips"></div>
+  <textarea id="note" placeholder="What happened today? What mattered?" aria-label="Note"></textarea>
+  <div class="row">
+    <button class="quiet" id="clearDay">Clear this day</button>
+    <button class="primary" id="doneDay">Done</button>
+  </div>
+</dialog>
+
+<dialog id="setDlg" aria-labelledby="setTitle">
+  <div class="dhead"><h3 id="setTitle">Settings</h3></div>
+  <label for="birth">Birth date</label>
+  <input type="date" id="birth">
+  <label for="span">Years to show</label>
+  <input type="number" id="span" min="1" max="120" inputmode="numeric">
+  <label for="acts">Activities you track (comma separated)</label>
+  <input type="text" id="acts" placeholder="Workout, Read, Outside">
+  <div class="row">
+    <span>
+      <button class="quiet" id="expJson">Export JSON</button>
+      <button class="quiet" id="expMd">Export Markdown</button>
+      <button class="quiet" id="impBtn">Import JSON</button>
+      <input type="file" id="impFile" accept="application/json,.json" hidden>
+    </span>
+    <button class="primary" id="saveSet">Save</button>
+  </div>
+  <p class="hint">Entries are kept in this browser. Export now and then to keep a copy. Keys: 1, 2, 3 switch views, T jumps to today, Esc zooms out.</p>
+</dialog>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+const KEY = 'lifecal:v1';
+const $ = id => document.getElementById(id);
+const main = $('main');
+const pad = n => String(n).padStart(2,'0');
+const k = (y,m,d) => `${y}-${pad(m+1)}-${pad(d)}`;
+const dim = (y,m) => new Date(y,m+1,0).getDate();
+const firstDow = (y,m) => new Date(y,m,1).getDay(); // Sunday first
+const fmt = n => n.toLocaleString();
+const MONTHS = Array.from({length:12},(_,m)=>new Date(2000,m,1).toLocaleString(undefined,{month:'long'}));
+const MON = Array.from({length:12},(_,m)=>new Date(2000,m,1).toLocaleString(undefined,{month:'short'}));
+const WD = Array.from({length:7},(_,i)=>new Date(2000,0,2+i).toLocaleString(undefined,{weekday:'narrow'}));
+
+const now = new Date();
+const T = {y:now.getFullYear(), m:now.getMonth(), d:now.getDate()};
+const todayKey = k(T.y,T.m,T.d);
+const todayMid = new Date(T.y,T.m,T.d);
+
+// ---------- storage ----------
+function load(){
+  try{
+    const s = JSON.parse(localStorage.getItem(KEY) || 'null');
+    if (s && s.entries && s.settings) return s;
+  }catch(e){}
+  return {settings:{birth:null, span:75, activities:['Workout','Read','Outside']}, entries:{}};
+}
+let store = load();
+function save(){
+  try{ localStorage.setItem(KEY, JSON.stringify(store)); }
+  catch(e){ toast('This browser is not keeping entries. Export to save a copy.'); }
+}
+
+// ---------- derived ----------
+let BY, BM, BD, birthKey, EY;
+function derive(){
+  const b = store.settings.birth;
+  if (!b) { BY = null; return; }
+  [BY,BM,BD] = b.split('-').map(Number); BM -= 1;
+  birthKey = b;
+  EY = Math.max(BY + (store.settings.span||75) - 1, T.y);
+}
+function level(e){
+  if (!e) return 0;
+  let s = 0;
+  const n = (e.note||'').trim();
+  if (n) s += 0.35 + Math.min(0.45, n.length/800);
+  s += (e.acts ? e.acts.length : 0) * 0.2;
+  if (s <= 0) return 0;
+  return s < 0.4 ? 1 : s < 0.65 ? 2 : s < 0.9 ? 3 : 4;
+}
+function cellCls(key){
+  const c = [];
+  if (key < birthKey) c.push('pre');
+  else if (key > todayKey) c.push('fut');
+  const lv = level(store.entries[key]);
+  if (lv) c.push('l'+lv);
+  if (key === todayKey) c.push('td');
+  return c.join(' ');
+}
+function ageAt(y,m){ return y - BY - (m < BM ? 1 : 0); }
+function monthCounts(){
+  const map = {};
+  for (const key in store.entries){
+    if (level(store.entries[key]) > 0){ const p = key.slice(0,7); map[p] = (map[p]||0) + 1; }
+  }
+  return map;
+}
+
+// ---------- header ----------
+function renderStat(){
+  const el = $('stat');
+  if (BY === null){ el.textContent = 'Your years, one day at a time.'; return; }
+  const b = new Date(BY,BM,BD);
+  const end = new Date(BY + (store.settings.span||75), BM, BD);
+  const lived = Math.round((todayMid - b)/864e5);
+  const left = Math.max(0, Math.round((end - todayMid)/864e5));
+  const written = Object.values(store.entries).filter(e=>level(e)>0).length;
+  el.innerHTML = `<b>${fmt(lived)}</b> days lived, <b>${fmt(left)}</b> to go of ${store.settings.span||75} years. ${fmt(written)} ${written===1?'day':'days'} written.`;
+}
+const bar = $('bar');
+new ResizeObserver(()=>{
+  document.documentElement.style.setProperty('--hdr', bar.getBoundingClientRect().height + 'px');
+}).observe(bar);
+
+// ---------- state ----------
+const state = {level:'life', focus:{y:T.y, m:T.m}};
+function setLevel(lv, focus){
+  if (focus) state.focus = {...state.focus, ...focus};
+  state.level = lv;
+  document.querySelectorAll('.seg button').forEach(b=>b.setAttribute('aria-pressed', String(b.dataset.lv===lv)));
+  render();
+}
+
+// ---------- life view ----------
+function renderLife(){
+  const mc = monthCounts();
+  let h = '<div class="life">';
+  for (let y = BY; y <= EY; y++){
+    const age = y - BY;
+    if (age % 10 === 0) h += `<div class="decade">${age === 0 ? 'First decade' : 'Your ' + age + 's'}</div>`;
+    const cls = y > T.y ? 'future' : y === T.y ? 'now' : '';
+    let bars = '';
+    for (let m = 0; m < 12; m++){
+      const p = `${y}-${pad(m+1)}`;
+      const fut = y > T.y || (y === T.y && m > T.m);
+      const pre = p < birthKey.slice(0,7);
+      if (fut || pre){ bars += '<i class="nb"></i>'; continue; }
+      const c = mc[p] || 0;
+      const frac = c / dim(y,m);
+      bars += `<i class="${c?'on':''}" style="height:${Math.max(10, Math.round(frac*100))}%"></i>`;
+    }
+    h += `<button class="tile ${cls}" data-y="${y}" aria-label="${y}, age ${age}"><span class="yr">${y}</span><span class="age">age ${age}</span><span class="bars" aria-hidden="true">${bars}</span></button>`;
+  }
+  main.innerHTML = h + '</div>';
+  const t = main.querySelector(`.tile[data-y="${state.focus.y}"]`) || main.querySelector('.tile.now');
+  if (t) t.scrollIntoView({block:'center'});
+}
+
+// ---------- year + month sections ----------
+function yearHTML(i){
+  const y = BY + i;
+  let h = `<section class="year" data-y="${y}"><h2>${y}<small>age ${y-BY}</small></h2><div class="months">`;
+  for (let m = 0; m < 12; m++){
+    h += `<button class="mo" data-y="${y}" data-m="${m}" aria-label="${MONTHS[m]} ${y}"><div class="lbl">${MON[m]}</div><div class="mini" aria-hidden="true">`;
+    for (let i = 0, o = firstDow(y,m); i < o; i++) h += '<span class="b"></span>';
+    for (let d = 1, n = dim(y,m); d <= n; d++){ const key = k(y,m,d); h += `<span data-k="${key}" class="${cellCls(key)}"></span>`; }
+    h += '</div></button>';
+  }
+  return h + '</div></section>';
+}
+function monthHTML(i){
+  const y = BY + Math.floor(i/12), m = i % 12;
+  let h = `<section class="month" data-y="${y}" data-m="${m}"><h2>${MONTHS[m]}<small>${y}, age ${Math.max(0,ageAt(y,m))}</small></h2><div class="days">`;
+  for (const w of WD) h += `<div class="wd" aria-hidden="true">${w}</div>`;
+  for (let i = 0, o = firstDow(y,m); i < o; i++) h += '<span class="b"></span>';
+  for (let d = 1, n = dim(y,m); d <= n; d++){
+    const key = k(y,m,d);
+    const label = new Date(y,m,d).toLocaleDateString(undefined,{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+    h += `<button class="day ${cellCls(key)}" data-k="${key}" aria-label="${label}">${d}</button>`;
+  }
+  return h + '</div></section>';
+}
+
+// windowed infinite list, grows in both directions as you scroll
+let win = null;
+function renderList(count, anchor, fn){
+  anchor = Math.max(0, Math.min(count-1, anchor));
+  win = {lo: Math.max(0, anchor-1), hi: Math.min(count-1, anchor+5), count, fn};
+  let h = '';
+  for (let i = win.lo; i <= win.hi; i++) h += fn(i);
+  main.innerHTML = `<div id="list">${h}</div>`;
+  const list = $('list');
+  list.children[anchor - win.lo].scrollIntoView({block:'start'});
+  fill();
+}
+function fill(){
+  if (!win || state.level === 'life') return;
+  const list = $('list'); if (!list) return;
+  const vh = innerHeight;
+  let g = 0;
+  while (win.hi < win.count-1 && list.lastElementChild.getBoundingClientRect().bottom < vh*2.5 && g++ < 24){
+    win.hi++; list.insertAdjacentHTML('beforeend', win.fn(win.hi));
+  }
+  g = 0;
+  while (win.lo > 0 && list.firstElementChild.getBoundingClientRect().top > -vh*1.5 && g++ < 24){
+    const before = document.documentElement.scrollHeight;
+    win.lo--; list.insertAdjacentHTML('afterbegin', win.fn(win.lo));
+    window.scrollBy(0, document.documentElement.scrollHeight - before);
+  }
+  trackFocus();
+}
+function trackFocus(){
+  const list = $('list'); if (!list) return;
+  const top = bar.getBoundingClientRect().bottom + 8;
+  for (const s of list.children){
+    if (s.getBoundingClientRect().bottom > top){
+      const y = +s.dataset.y;
+      if (s.dataset.m !== undefined) state.focus = {y, m:+s.dataset.m};
+      else if (y !== state.focus.y) state.focus = {y, m: y === T.y ? T.m : 0};
+      return;
+    }
+  }
+}
+let ticking = false;
+addEventListener('scroll', ()=>{
+  if (ticking) return; ticking = true;
+  requestAnimationFrame(()=>{ ticking = false; fill(); });
+}, {passive:true});
+
+function render(){
+  derive(); renderStat();
+  if (BY === null){
+    win = null;
+    main.innerHTML = `<div class="empty"><p>Add your birth date to lay out your years.</p><button class="primary" id="startBtn">Add birth date</button></div>`;
+    $('startBtn').onclick = openSettings;
+    return;
+  }
+  const f = state.focus;
+  if (f.y < BY) state.focus = {y:BY, m:BM};
+  if (f.y > EY) state.focus = {y:EY, m:11};
+  if (state.level === 'life'){ win = null; renderLife(); }
+  else if (state.level === 'year') renderList(EY-BY+1, state.focus.y-BY, yearHTML);
+  else renderList((EY-BY+1)*12, (state.focus.y-BY)*12 + state.focus.m, monthHTML);
+}
+
+// ---------- interactions ----------
+main.addEventListener('click', e=>{
+  const t = e.target.closest('.tile, .mo, .day');
+  if (!t) return;
+  if (t.classList.contains('tile')) setLevel('year', {y:+t.dataset.y, m: +t.dataset.y === T.y ? T.m : 0});
+  else if (t.classList.contains('mo')) setLevel('month', {y:+t.dataset.y, m:+t.dataset.m});
+  else openDay(t.dataset.k);
+});
+document.querySelectorAll('.seg button').forEach(b=>b.onclick = ()=>{ trackFocus(); setLevel(b.dataset.lv); });
+$('todayBtn').onclick = ()=>{ state.focus = {y:T.y, m:T.m}; render(); };
+$('setBtn').onclick = openSettings;
+
+function typing(){ const a = document.activeElement; return a && (a.tagName === 'TEXTAREA' || a.tagName === 'INPUT'); }
+addEventListener('keydown', e=>{
+  if (document.querySelector('dialog[open]') || typing() || e.metaKey || e.ctrlKey || e.altKey) return;
+  if (e.key === 'Escape'){ trackFocus(); if (state.level === 'month') setLevel('year'); else if (state.level === 'year') setLevel('life'); }
+  else if (e.key === 't' || e.key === 'T'){ $('todayBtn').click(); }
+  else if (e.key === '1'){ trackFocus(); setLevel('life'); }
+  else if (e.key === '2'){ trackFocus(); setLevel('year'); }
+  else if (e.key === '3'){ trackFocus(); setLevel('month'); }
+});
+
+// ---------- day editor ----------
+const dayDlg = $('dayDlg'), noteEl = $('note');
+let cur = null, saveTimer = null;
+function openDay(key){
+  cur = key;
+  const [y,m,d] = key.split('-').map(Number);
+  const dt = new Date(y,m-1,d);
+  $('dayTitle').textContent = dt.toLocaleDateString(undefined,{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  const n = Math.round((dt - new Date(BY,BM,BD))/864e5) + 1;
+  const diff = Math.round((dt - todayMid)/864e5);
+  let sub = n >= 1 ? `Day ${fmt(n)} of your life` : 'Before you were born';
+  if (diff === 0) sub += ', today';
+  else if (diff > 0) sub += `, ${fmt(diff)} ${diff===1?'day':'days'} from now`;
+  $('daySub').textContent = sub;
+  const e = store.entries[key] || {note:'', acts:[]};
+  noteEl.value = e.note || '';
+  const acts = store.settings.activities || [];
+  const extra = (e.acts||[]).filter(a=>!acts.includes(a));
+  $('chips').innerHTML = [...acts, ...extra].map(a=>`<button class="chip" data-a="${escapeHtml(a)}" aria-pressed="${(e.acts||[]).includes(a)}">${escapeHtml(a)}</button>`).join('');
+  if (!dayDlg.open) dayDlg.showModal();
+  if (matchMedia('(pointer:fine)').matches) noteEl.focus(); else $('doneDay').focus();
+}
+function commit(){
+  if (!cur) return;
+  clearTimeout(saveTimer);
+  const note = noteEl.value;
+  const acts = [...document.querySelectorAll('#chips .chip[aria-pressed="true"]')].map(b=>b.dataset.a);
+  if (!note.trim() && !acts.length) delete store.entries[cur];
+  else store.entries[cur] = {note, acts, updated: Date.now()};
+  save(); refreshCells(cur); renderStat();
+}
+function refreshCells(key){
+  document.querySelectorAll(`[data-k="${key}"]`).forEach(el=>{
+    el.className = (el.classList.contains('day') ? 'day ' : '') + cellCls(key);
+  });
+}
+function shiftDay(key, n){
+  const [y,m,d] = key.split('-').map(Number);
+  const dt = new Date(y, m-1, d+n);
+  return k(dt.getFullYear(), dt.getMonth(), dt.getDate());
+}
+noteEl.addEventListener('input', ()=>{ clearTimeout(saveTimer); saveTimer = setTimeout(commit, 400); });
+noteEl.addEventListener('keydown', e=>{ if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) dayDlg.close(); });
+$('chips').addEventListener('click', e=>{
+  const c = e.target.closest('.chip'); if (!c) return;
+  c.setAttribute('aria-pressed', String(c.getAttribute('aria-pressed') !== 'true'));
+  commit();
+});
+$('prevDay').onclick = ()=>{ commit(); openDay(shiftDay(cur,-1)); };
+$('nextDay').onclick = ()=>{ commit(); openDay(shiftDay(cur,1)); };
+$('doneDay').onclick = ()=> dayDlg.close();
+$('clearDay').onclick = ()=>{
+  noteEl.value = '';
+  document.querySelectorAll('#chips .chip').forEach(c=>c.setAttribute('aria-pressed','false'));
+  commit(); toast('Day cleared');
+};
+dayDlg.addEventListener('close', ()=>{ commit(); cur = null; });
+
+// ---------- settings ----------
+const setDlg = $('setDlg');
+function openSettings(){
+  $('birth').value = store.settings.birth || '';
+  $('span').value = store.settings.span || 75;
+  $('acts').value = (store.settings.activities||[]).join(', ');
+  setDlg.showModal();
+}
+$('saveSet').onclick = ()=>{
+  const b = $('birth').value;
+  if (!b){ toast('Add a birth date to lay out your years'); $('birth').focus(); return; }
+  if (b > todayKey){ toast('Birth date has to be in the past'); $('birth').focus(); return; }
+  const span = Math.min(120, Math.max(1, parseInt($('span').value,10) || 75));
+  const acts = $('acts').value.split(',').map(s=>s.trim()).filter(Boolean).slice(0,12);
+  store.settings = {birth:b, span, activities:acts};
+  save(); setDlg.close(); render(); toast('Settings saved');
+};
+
+// export / import
+let dlPromise = null;
+function downloads(){
+  if (!dlPromise) dlPromise = Promise.resolve(null);
+  return dlPromise;
+}
+async function offerFile(filename, data, mime){
+  const dl = await downloads();
+  if (dl){
+    try{ await dl.save({filename, data}); toast('Exported'); }
+    catch(err){ if (err && err.code === 'declined') return; toast('Export is unavailable here'); }
+    return;
+  }
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([data], {type:mime}));
+  a.download = filename; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href), 2000);
+}
+$('expJson').onclick = ()=> offerFile(`lifetime-calendar-${todayKey}.json`, JSON.stringify(store, null, 2), 'application/json');
+$('expMd').onclick = ()=>{
+  const keys = Object.keys(store.entries).sort();
+  const md = '# Journal\n\n' + keys.map(key=>{
+    const e = store.entries[key];
+    const acts = e.acts && e.acts.length ? `Activities: ${e.acts.join(', ')}\n\n` : '';
+    return `## ${key}\n\n${acts}${(e.note||'').trim()}\n`;
+  }).join('\n');
+  offerFile(`journal-${todayKey}.md`, md, 'text/markdown');
+};
+$('impBtn').onclick = ()=> $('impFile').click();
+$('impFile').onchange = e=>{
+  const f = e.target.files[0]; if (!f) return;
+  const r = new FileReader();
+  r.onload = ()=>{
+    try{
+      const d = JSON.parse(r.result);
+      if (!d || typeof d.entries !== 'object') throw 0;
+      let n = 0;
+      for (const key in d.entries){ if (/^\d{4}-\d{2}-\d{2}$/.test(key)){ store.entries[key] = d.entries[key]; n++; } }
+      if (!store.settings.birth && d.settings && d.settings.birth) store.settings = {...store.settings, ...d.settings};
+      save(); setDlg.close(); render(); toast(`Imported ${fmt(n)} ${n===1?'day':'days'}`);
+    }catch(_){ toast('That file is not a calendar export. Choose a .json file exported from here.'); }
+    e.target.value = '';
+  };
+  r.readAsText(f);
+};
+
+// ---------- utils ----------
+function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+let toastTimer;
+function toast(msg){
+  const t = $('toast'); t.textContent = msg; t.classList.add('show');
+  clearTimeout(toastTimer); toastTimer = setTimeout(()=>t.classList.remove('show'), 2600);
+}
+
+render();
+})();
+</script>
+</body>
+</html>

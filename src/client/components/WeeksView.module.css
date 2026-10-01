@@ -1,0 +1,92 @@
+.section {
+  scroll-margin-top: calc(var(--hdr, 64px) + 4px);
+  padding: 12px 0 18px;
+  border-top: 1px solid var(--rule);
+}
+
+.heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0 0 10px;
+  font-size: 16px;
+  font-weight: 400;
+  font-style: italic;
+  color: var(--muted);
+}
+
+.perRow {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 2px;
+  font-style: normal;
+  font-size: 13px;
+
+  & button {
+    border: 0;
+    background: none;
+    padding: 1px 6px;
+    border-radius: 999px;
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+
+    &[aria-pressed="true"] {
+      background: var(--ink);
+      color: var(--paper);
+    }
+
+    &:hover:not([aria-pressed="true"]) {
+      background: var(--hover);
+    }
+  }
+
+  & small {
+    margin-left: 4px;
+    font-size: 13px;
+  }
+}
+
+.ageRow {
+  display: grid;
+  grid-template-columns: 2em minmax(0, 1fr);
+  align-items: start;
+  margin-bottom: 2px;
+
+  /* Multi-row years get breathing room so each year reads as a block. */
+  .section:not([data-per-row="52"]) & {
+    margin-bottom: 8px;
+  }
+}
+
+.age {
+  font-size: 11px;
+  line-height: 1;
+  padding-top: 2px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.weeks {
+  display: grid;
+  grid-template-columns: repeat(var(--cols, 52), minmax(0, 1fr));
+  gap: 2px;
+  max-width: calc(var(--cols, 52) * 26px);
+}
+
+.wk {
+  aspect-ratio: 1;
+  min-width: 0;
+  border: 0;
+  padding: 0;
+  border-radius: 2px;
+  background: var(--cell-bg, var(--lived));
+  box-shadow: var(--cell-ring, none);
+  cursor: pointer;
+
+  &:hover {
+    filter: brightness(0.92);
+  }
+}

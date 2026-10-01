@@ -1,0 +1,53 @@
+/* Shared button styles. */
+
+.plain {
+  border: 1px solid var(--rule);
+  background: none;
+  border-radius: 999px;
+  padding: 4px 12px;
+  cursor: pointer;
+  font-size: 15px;
+
+  &:hover {
+    background: var(--hover);
+  }
+}
+
+.primary {
+  background: var(--ink);
+  color: var(--paper);
+  border: 0;
+  border-radius: 999px;
+  padding: 6px 18px;
+  cursor: pointer;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: default;
+  }
+}
+
+.quiet {
+  background: none;
+  border: 0;
+  color: var(--muted);
+  cursor: pointer;
+  padding: 6px 4px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.icon {
+  border: 1px solid var(--rule);
+  background: none;
+  border-radius: 8px;
+  width: 36px;
+  height: 34px;
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 1;
+
+  &:hover {
+    background: var(--hover);
+  }
+}

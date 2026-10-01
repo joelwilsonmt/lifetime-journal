@@ -1,0 +1,125 @@
+:root {
+  --paper: #eef0ec;
+  --ink: #1e2428;
+  --muted: #66706b;
+  --rule: #cdd3cc;
+  --hover: #e2e6e0;
+  --lived: #d3d9d2;
+  --field: #f7f8f5;
+  --f1: #b9d1c4;
+  --f2: #7fae98;
+  --f3: #437d66;
+  --f4: #22523f;
+  --onfill: #f4f7f2;
+  --brass: #a87a1e;
+  --backdrop: rgb(10 14 14 / 0.45);
+  /* Era hues: muted, kept clear of the pine fill ramp and the brass. */
+  --era-0: #5b7ca6;
+  --era-1: #b0644a;
+  --era-2: #8a5e8e;
+  --era-3: #7a6a58;
+  --era-4: #a0526b;
+  --era-5: #4a7f8c;
+
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  scroll-padding-top: env(safe-area-inset-top, 0px);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #141819;
+    --ink: #e2e6e1;
+    --muted: #8c9691;
+    --rule: #2c3436;
+    --hover: #1e2426;
+    --lived: #252c2e;
+    --field: #1a1f20;
+    --f1: #23443a;
+    --f2: #2f6a53;
+    --f3: #4c9878;
+    --f4: #8bd0b0;
+    --onfill: #0f1413;
+    --brass: #d6a947;
+    --era-0: #7d9cc6;
+    --era-1: #cf8466;
+    --era-2: #ae84b2;
+    --era-3: #a6927c;
+    --era-4: #c87a92;
+    --era-5: #6fa6b3;
+  }
+}
+
+:root[data-theme="dark"] {
+  --paper: #141819;
+  --ink: #e2e6e1;
+  --muted: #8c9691;
+  --rule: #2c3436;
+  --hover: #1e2426;
+  --lived: #252c2e;
+  --field: #1a1f20;
+  --f1: #23443a;
+  --f2: #2f6a53;
+  --f3: #4c9878;
+  --f4: #8bd0b0;
+  --onfill: #0f1413;
+  --brass: #d6a947;
+  --era-0: #7d9cc6;
+  --era-1: #cf8466;
+  --era-2: #ae84b2;
+  --era-3: #a6927c;
+  --era-4: #c87a92;
+  --era-5: #6fa6b3;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: Spectral, Georgia, "Times New Roman", serif;
+  font-size: 17px;
+  line-height: 1.5;
+  /* The windowed lists compensate scroll position themselves when prepending. */
+  overflow-anchor: none;
+  -webkit-text-size-adjust: 100%;
+}
+
+:where(button, input, textarea) {
+  font: inherit;
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--brass);
+  outline-offset: 2px;
+}
+
+:where(input, textarea) {
+  color: var(--ink);
+  background: var(--field);
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  padding: 10px 12px;
+  width: 100%;
+}
+
+dialog {
+  border: 1px solid var(--rule);
+  border-radius: 12px;
+  background: var(--paper);
+  color: var(--ink);
+  padding: 18px 18px 16px;
+  width: min(580px, calc(100vw - 20px));
+  max-height: calc(100dvh - 40px);
+
+  &::backdrop {
+    background: var(--backdrop);
+  }
+}

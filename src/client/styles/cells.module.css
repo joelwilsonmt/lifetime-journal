@@ -1,0 +1,49 @@
+/*
+ * Day states shared by the year minis and the month grid. Each state sets
+ * custom properties that the cell's own rule reads, so there is no
+ * specificity fight and no !important. Level rules come after fut/pre so a
+ * future day with an entry still shows its fill.
+ */
+
+.fut {
+  --cell-bg: transparent;
+  --cell-fg: var(--muted);
+  --cell-ring: inset 0 0 0 1px var(--rule);
+}
+
+.pre {
+  --cell-bg: transparent;
+  --cell-ring: inset 0 0 0 1px var(--rule);
+  opacity: 0.35;
+}
+
+.l1 {
+  --cell-bg: var(--f1);
+}
+
+.l2 {
+  --cell-bg: var(--f2);
+}
+
+.l3 {
+  --cell-bg: var(--f3);
+  --cell-fg: var(--onfill);
+}
+
+.l4 {
+  --cell-bg: var(--f4);
+  --cell-fg: var(--onfill);
+}
+
+.td {
+  outline: 2px solid var(--brass);
+  outline-offset: 1px;
+}
+
+/* Milestone: a small brass dot in the corner. */
+.ms {
+  background-image: radial-gradient(circle, var(--brass) 55%, transparent 62%);
+  background-size: 6px 6px;
+  background-position: right 2px bottom 2px;
+  background-repeat: no-repeat;
+}
