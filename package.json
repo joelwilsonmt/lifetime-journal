@@ -29,6 +29,9 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^2.5.14",
+    "@fontsource/besley": "^5.3.0",
+    "@fontsource/courier-prime": "^5.3.0",
+    "@fontsource/instrument-sans": "^5.3.0",
     "@fontsource/spectral": "^5.3.0",
     "@types/node": "^26.6.3",
     "@types/react": "^19.3.0",

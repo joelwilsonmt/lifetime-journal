@@ -2,7 +2,13 @@ import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { z } from 'zod';
 import { isValidDate } from '../shared/date.ts';
-import { DEFAULT_SETTINGS, type Settings } from '../shared/types.ts';
+import {
+  DEFAULT_SETTINGS,
+  FONTS,
+  MODES,
+  type Settings,
+  THEMES,
+} from '../shared/types.ts';
 import { isNotFound, writeFileAtomic } from './fsutil.ts';
 
 const dateSchema = z.string().refine(isValidDate, 'Must be a YYYY-MM-DD date');
@@ -39,6 +45,9 @@ export const settingsSchema = z.object({
     .max(500)
     .default([])
     .transform(a => a.toSorted((x, y) => x.date.localeCompare(y.date))),
+  theme: z.enum(THEMES).default('pine'),
+  mode: z.enum(MODES).default('system'),
+  font: z.enum(FONTS).default('spectral'),
 });
 
 export class SettingsStore {

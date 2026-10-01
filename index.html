@@ -4,8 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="color-scheme" content="light dark" />
-    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#EEF0EC" />
-    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#141819" />
+    <meta name="theme-color" content="#EEF0EC" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/manifest.webmanifest" />
@@ -14,6 +13,19 @@
     <meta name="apple-mobile-web-app-title" content="Lifetime" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <title>Lifetime calendar</title>
+    <script>
+      // Apply the saved theme before first paint (the app re-applies it from
+      // the server once settings load).
+      try {
+        const a = JSON.parse(localStorage.getItem('lifecal:appearance') || 'null');
+        const r = document.documentElement;
+        if (a) {
+          r.dataset.palette = a.theme;
+          r.dataset.font = a.font;
+          if (a.mode !== 'system') r.dataset.theme = a.mode;
+        }
+      } catch {}
+    </script>
   </head>
   <body>
     <div id="root"></div>

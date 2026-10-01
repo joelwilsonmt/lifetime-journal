@@ -9,6 +9,7 @@ import {
 } from 'react';
 import { dayNumberOf, parseDate, todayKey } from '../shared/date.ts';
 import {
+  type Appearance,
   DEFAULT_SETTINGS,
   type Level,
   type Settings,
@@ -30,6 +31,7 @@ import {
   WeeksSection,
 } from './components/WeeksSection.tsx';
 import { YearSection } from './components/YearSection.tsx';
+import { applyAppearance, syncThemeColor } from './lib/appearance.ts';
 import { type Days, makeCal, monthCounts } from './lib/cal.ts';
 import { pulse, transition } from './lib/motion.ts';
 import { weekCounts, weekOf } from './lib/weeks.ts';
@@ -171,6 +173,33 @@ export function App() {
     document.addEventListener('visibilitychange', onVisible);
     return () => document.removeEventListener('visibilitychange', onVisible);
   }, []);
+
+  // Theme, mode and typeface follow settings; the status bar follows the OS
+  // scheme when mode is "system".
+  const theme = settings?.theme;
+  const mode = settings?.mode;
+  const font = settings?.font;
+  useEffect(() => {
+    if (theme && mode && font) applyAppearance({ theme, mode, font });
+  }, [theme, mode, font]);
+  useEffect(() => {
+    const mq = matchMedia('(prefers-color-scheme: dark)');
+    mq.addEventListener('change', syncThemeColor);
+    return () => mq.removeEventListener('change', syncThemeColor);
+  }, []);
+
+  const settingsRef = useRef(settings);
+  settingsRef.current = settings;
+  const onAppearance = useCallback(
+    (a: Partial<Appearance>) => {
+      const cur = settingsRef.current;
+      if (!cur) return;
+      const next = { ...cur, ...a };
+      setSettings(next);
+      api.putSettings(next).catch(() => toast('Could not save appearance'));
+    },
+    [toast]
+  );
 
   // Expose the header height for scroll-margin on sections.
   useLayoutEffect(() => {
@@ -450,6 +479,7 @@ export function App() {
           anchor={Math.floor(focusAge / 10)}
           homeIndex={Math.floor(todayAge / 10)}
           anchorSelector={`[data-age="${focusAge}"]`}
+          homeSelector={`[data-age="${todayAge}"]`}
           onAway={setAway}
           headerRef={headerRef}
           onFocus={onFocusSection}
@@ -563,6 +593,7 @@ export function App() {
           void load().then(() => navigate(view.level));
         }}
         onEditLife={() => setDialog('eras')}
+        onAppearance={onAppearance}
         toast={toast}
       />
       <ErasDialog

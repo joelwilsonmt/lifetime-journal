@@ -13,7 +13,20 @@ export interface Milestone {
   date: string;
 }
 
-export interface Settings {
+export const THEMES = ['pine', 'ember', 'tide', 'dusk', 'ledger'] as const;
+export type Theme = (typeof THEMES)[number];
+export const MODES = ['system', 'light', 'dark'] as const;
+export type Mode = (typeof MODES)[number];
+export const FONTS = ['spectral', 'besley', 'instrument', 'courier'] as const;
+export type Font = (typeof FONTS)[number];
+
+export interface Appearance {
+  theme: Theme;
+  mode: Mode;
+  font: Font;
+}
+
+export interface Settings extends Appearance {
   /** Local calendar date, YYYY-MM-DD. Null until the user sets it. */
   birth: string | null;
   /** Live through this age: the calendar and countdown run to the next birthday. */
@@ -79,4 +92,7 @@ export const DEFAULT_SETTINGS: Settings = {
   activities: ['Workout', 'Read', 'Outside'],
   eras: [],
   milestones: [],
+  theme: 'pine',
+  mode: 'system',
+  font: 'spectral',
 };

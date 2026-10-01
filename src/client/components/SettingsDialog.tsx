@@ -4,6 +4,15 @@ import type {
   PrototypeExport,
   Settings,
 } from '../../shared/types.ts';
+import {
+  type Appearance,
+  FONTS,
+  type Font,
+  MODES,
+  type Mode,
+  THEMES,
+  type Theme,
+} from '../../shared/types.ts';
 import { api } from '../api.ts';
 import { fmt } from '../lib/cal.ts';
 import { backdropDismiss } from '../lib/dialog.ts';
@@ -18,8 +27,35 @@ interface Props {
   onSaved: (s: Settings) => void;
   onImported: (r: ImportResult) => void;
   onEditLife: () => void;
+  /** Applied and saved immediately, unlike the fields above. */
+  onAppearance: (a: Partial<Appearance>) => void;
   toast: (msg: string) => void;
 }
+
+const THEME_NAMES: Record<Theme, string> = {
+  pine: 'Pine',
+  ember: 'Ember',
+  tide: 'Tide',
+  dusk: 'Dusk',
+  ledger: 'Ledger',
+};
+const MODE_NAMES: Record<Mode, string> = {
+  system: 'System',
+  light: 'Light',
+  dark: 'Dark',
+};
+const FONT_NAMES: Record<Font, string> = {
+  spectral: 'Spectral',
+  besley: 'Besley',
+  instrument: 'Instrument Sans',
+  courier: 'Courier Prime',
+};
+const FONT_STACKS: Record<Font, string> = {
+  spectral: 'Spectral, serif',
+  besley: 'Besley, serif',
+  instrument: "'Instrument Sans', sans-serif",
+  courier: "'Courier Prime', monospace",
+};
 
 export function SettingsDialog({
   open,
@@ -29,6 +65,7 @@ export function SettingsDialog({
   onSaved,
   onImported,
   onEditLife,
+  onAppearance,
   toast,
 }: Props) {
   const dlg = useRef<HTMLDialogElement>(null);
@@ -176,6 +213,66 @@ export function SettingsDialog({
           Eras and milestones
         </button>
       </p>
+
+      <h4 className={s.sectionHead}>
+        Appearance <small className={s.headNote}>applies right away</small>
+      </h4>
+      <fieldset className={s.themes}>
+        <legend className={s.srOnly}>Theme</legend>
+        {THEMES.map(t => (
+          <label key={t} data-palette={t} className={s.swatch}>
+            <input
+              type="radio"
+              name="theme"
+              className={s.srOnly}
+              checked={settings.theme === t}
+              onChange={() => onAppearance({ theme: t })}
+            />
+            <span className={s.ramp} aria-hidden="true">
+              <i style={{ background: 'var(--f1)' }} />
+              <i style={{ background: 'var(--f2)' }} />
+              <i style={{ background: 'var(--f3)' }} />
+              <i style={{ background: 'var(--f4)' }} />
+              <i className={s.today} />
+            </span>
+            {THEME_NAMES[t]}
+          </label>
+        ))}
+      </fieldset>
+      <fieldset className={s.optRow}>
+        <legend className={s.optLabel}>Mode</legend>
+        <span className={s.opts}>
+          {MODES.map(m => (
+            <label key={m}>
+              <input
+                type="radio"
+                name="mode"
+                className={s.srOnly}
+                checked={settings.mode === m}
+                onChange={() => onAppearance({ mode: m })}
+              />
+              {MODE_NAMES[m]}
+            </label>
+          ))}
+        </span>
+      </fieldset>
+      <fieldset className={s.optRow}>
+        <legend className={s.optLabel}>Type</legend>
+        <span className={s.opts}>
+          {FONTS.map(f => (
+            <label key={f} style={{ fontFamily: FONT_STACKS[f] }}>
+              <input
+                type="radio"
+                name="font"
+                className={s.srOnly}
+                checked={settings.font === f}
+                onChange={() => onAppearance({ font: f })}
+              />
+              {FONT_NAMES[f]}
+            </label>
+          ))}
+        </span>
+      </fieldset>
       <div className={s.row}>
         <span>
           <button

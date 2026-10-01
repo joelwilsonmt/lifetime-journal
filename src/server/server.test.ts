@@ -177,6 +177,9 @@ describe('api', () => {
       activities: ['Run', 'Read'],
       eras: [],
       milestones: [],
+      theme: 'pine',
+      mode: 'system',
+      font: 'spectral',
     });
     const fresh = new SettingsStore(dir);
     expect((await fresh.get()).birth).toBe('1990-04-12');

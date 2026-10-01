@@ -16,6 +16,9 @@ is a markdown file, so `data/journal` doubles as an Obsidian vault.
   only the days that have it, with counts per year and month.
 - **Eras and milestones** (on the Life view, or in Settings) label stretches of
   life and single days on the calendar.
+- **Appearance** (Settings): five themes (Pine, Ember, Tide, Dusk, Ledger),
+  system/light/dark mode, and four typefaces. Saved with your settings, so
+  every device matches.
 - **Conflicts:** if a day was changed on another device or in Obsidian while
   you had it open, the editor asks which version to keep instead of
   overwriting it.

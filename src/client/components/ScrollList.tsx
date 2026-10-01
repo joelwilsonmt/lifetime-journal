@@ -24,6 +24,8 @@ interface Props {
   headerRef: RefObject<HTMLElement | null>;
   /** Scroll to this element inside the anchor section instead of its top. */
   anchorSelector?: string;
+  /** Measure this element inside the home section rather than all of it. */
+  homeSelector?: string;
 }
 
 const APPEND_STEP = 3;
@@ -43,6 +45,7 @@ export function ScrollList({
   onAway,
   headerRef,
   anchorSelector,
+  homeSelector,
 }: Props) {
   const start = Math.max(0, Math.min(count - 1, anchor));
   const [win, setWin] = useState(() => ({
@@ -77,12 +80,14 @@ export function ScrollList({
       }
     }
     // Home counts as in view while a good part of it is on screen.
-    const home = list.children[homeIndex - lo];
+    const section = list.children[homeIndex - lo];
+    const home =
+      (homeSelector && section?.querySelector(homeSelector)) || section;
     const r = home?.getBoundingClientRect();
     const overlap = r ? Math.min(r.bottom, vh) - Math.max(r.top, top) : 0;
     if (r && overlap > Math.min(150, r.height / 2)) onAway(null);
     else onAway(focusIndex < homeIndex ? 'down' : 'up');
-  }, [count, onFocus, homeIndex, onAway, headerRef]);
+  }, [count, onFocus, homeIndex, homeSelector, onAway, headerRef]);
 
   useLayoutEffect(() => {
     winRef.current = win;

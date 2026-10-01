@@ -206,3 +206,120 @@
   font-size: 15px;
   color: var(--muted);
 }
+
+/* Appearance */
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.themes {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  gap: 8px;
+  border: 0;
+  padding: 0;
+  margin: 0;
+}
+
+/* Each swatch carries data-palette, so it renders in its own theme's colors. */
+.swatch {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: flex-start;
+  padding: 8px 10px 7px;
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  background: var(--paper);
+  color: var(--ink);
+  font-size: 14px;
+  cursor: pointer;
+
+  &:has(:checked) {
+    border-color: var(--brass);
+    box-shadow: inset 0 0 0 1px var(--brass);
+  }
+
+  &:has(:focus-visible) {
+    outline: 2px solid var(--brass);
+    outline-offset: 2px;
+  }
+}
+
+.ramp {
+  display: flex;
+  gap: 3px;
+
+  & i {
+    width: 12px;
+    height: 12px;
+    border-radius: 2px;
+  }
+
+  & .today {
+    background: var(--lived);
+    outline: 1.5px solid var(--brass);
+    outline-offset: 1px;
+    margin-left: 3px;
+  }
+}
+
+.optRow {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px 12px;
+  margin: 12px 0 0;
+  padding: 0;
+  border: 0;
+}
+
+.optLabel {
+  float: left;
+  min-width: 3.5em;
+  padding: 0;
+  font-size: 15px;
+  color: var(--muted);
+}
+
+.opts {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 4px;
+
+  & label {
+    border: 1px solid var(--rule);
+    border-radius: 999px;
+    padding: 3px 12px;
+    font-size: 15px;
+    cursor: pointer;
+
+    &:has(:checked) {
+      background: var(--ink);
+      border-color: var(--ink);
+      color: var(--paper);
+    }
+
+    &:hover:not(:has(:checked)) {
+      background: var(--hover);
+    }
+
+    &:has(:focus-visible) {
+      outline: 2px solid var(--brass);
+      outline-offset: 2px;
+    }
+  }
+}
+
+.headNote {
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--muted);
+  margin-left: 6px;
+}

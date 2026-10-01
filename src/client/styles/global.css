@@ -1,25 +1,21 @@
+/*
+ * Themes. Every color is light-dark(light, dark), so `color-scheme` picks the
+ * variant: system by default, or forced by data-theme on <html>. A theme is
+ * just a token set on [data-palette], which also lets the theme picker preview
+ * any theme inside its own swatch. --brass is the "today" accent in every
+ * theme (brass in Pine, the original).
+ */
 :root {
-  --paper: #eef0ec;
-  --ink: #1e2428;
-  --muted: #66706b;
-  --rule: #cdd3cc;
-  --hover: #e2e6e0;
-  --lived: #d3d9d2;
-  --field: #f7f8f5;
-  --f1: #b9d1c4;
-  --f2: #7fae98;
-  --f3: #437d66;
-  --f4: #22523f;
-  --onfill: #f4f7f2;
-  --brass: #a87a1e;
+  color-scheme: light dark;
   --backdrop: rgb(10 14 14 / 0.45);
+  --font: Spectral, Georgia, "Times New Roman", serif;
   /* Era hues: muted, kept clear of the pine fill ramp and the brass. */
-  --era-0: #5b7ca6;
-  --era-1: #b0644a;
-  --era-2: #8a5e8e;
-  --era-3: #7a6a58;
-  --era-4: #a0526b;
-  --era-5: #4a7f8c;
+  --era-0: light-dark(#5b7ca6, #7d9cc6);
+  --era-1: light-dark(#b0644a, #cf8466);
+  --era-2: light-dark(#8a5e8e, #ae84b2);
+  --era-3: light-dark(#7a6a58, #a6927c);
+  --era-4: light-dark(#a0526b, #c87a92);
+  --era-5: light-dark(#4a7f8c, #6fa6b3);
 
   box-sizing: border-box;
   padding-top: env(safe-area-inset-top, 0px);
@@ -27,50 +23,106 @@
   scroll-padding-top: env(safe-area-inset-top, 0px);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --paper: #141819;
-    --ink: #e2e6e1;
-    --muted: #8c9691;
-    --rule: #2c3436;
-    --hover: #1e2426;
-    --lived: #252c2e;
-    --field: #1a1f20;
-    --f1: #23443a;
-    --f2: #2f6a53;
-    --f3: #4c9878;
-    --f4: #8bd0b0;
-    --onfill: #0f1413;
-    --brass: #d6a947;
-    --era-0: #7d9cc6;
-    --era-1: #cf8466;
-    --era-2: #ae84b2;
-    --era-3: #a6927c;
-    --era-4: #c87a92;
-    --era-5: #6fa6b3;
-  }
+:root[data-theme="light"] {
+  color-scheme: light;
 }
 
 :root[data-theme="dark"] {
-  --paper: #141819;
-  --ink: #e2e6e1;
-  --muted: #8c9691;
-  --rule: #2c3436;
-  --hover: #1e2426;
-  --lived: #252c2e;
-  --field: #1a1f20;
-  --f1: #23443a;
-  --f2: #2f6a53;
-  --f3: #4c9878;
-  --f4: #8bd0b0;
-  --onfill: #0f1413;
-  --brass: #d6a947;
-  --era-0: #7d9cc6;
-  --era-1: #cf8466;
-  --era-2: #ae84b2;
-  --era-3: #a6927c;
-  --era-4: #c87a92;
-  --era-5: #6fa6b3;
+  color-scheme: dark;
+}
+
+:root,
+[data-palette="pine"] {
+  --paper: light-dark(#eef0ec, #141819);
+  --ink: light-dark(#1e2428, #e2e6e1);
+  --muted: light-dark(#66706b, #8c9691);
+  --rule: light-dark(#cdd3cc, #2c3436);
+  --hover: light-dark(#e2e6e0, #1e2426);
+  --lived: light-dark(#d3d9d2, #252c2e);
+  --field: light-dark(#f7f8f5, #1a1f20);
+  --f1: light-dark(#b9d1c4, #23443a);
+  --f2: light-dark(#7fae98, #2f6a53);
+  --f3: light-dark(#437d66, #4c9878);
+  --f4: light-dark(#22523f, #8bd0b0);
+  --onfill: light-dark(#f4f7f2, #0f1413);
+  --brass: light-dark(#a87a1e, #d6a947);
+}
+
+[data-palette="ember"] {
+  --paper: light-dark(#f5efe6, #1a1512);
+  --ink: light-dark(#2b211a, #efe5da);
+  --muted: light-dark(#7a6a5c, #a39283);
+  --rule: light-dark(#ddd1c2, #3a302a);
+  --hover: light-dark(#ebe3d7, #241d19);
+  --lived: light-dark(#e2d7c8, #2e2621);
+  --field: light-dark(#fbf8f3, #201a16);
+  --f1: light-dark(#f0c9a8, #4a2a1c);
+  --f2: light-dark(#e09a6a, #7e3f22);
+  --f3: light-dark(#b8582e, #c66a3a);
+  --f4: light-dark(#7a3418, #f2a672);
+  --onfill: light-dark(#fff6ee, #1a1210);
+  --brass: light-dark(#1f6f6b, #4fb3aa);
+}
+
+[data-palette="tide"] {
+  --paper: light-dark(#eef2f5, #11161c);
+  --ink: light-dark(#1a2430, #dfe6ee);
+  --muted: light-dark(#627080, #8795a4);
+  --rule: light-dark(#cbd4dd, #27313b);
+  --hover: light-dark(#e1e8ee, #19212a);
+  --lived: light-dark(#d3dce4, #212a34);
+  --field: light-dark(#f7f9fb, #161d25);
+  --f1: light-dark(#bbd3ea, #1d3550);
+  --f2: light-dark(#7faad3, #285a8a);
+  --f3: light-dark(#3b72ae, #4f8fcf);
+  --f4: light-dark(#1e4778, #9cc8f2);
+  --onfill: light-dark(#f3f7fb, #0d1218);
+  --brass: light-dark(#d9603b, #f08a63);
+}
+
+[data-palette="dusk"] {
+  --paper: light-dark(#f2eff4, #17131c);
+  --ink: light-dark(#251d2c, #e9e2ef);
+  --muted: light-dark(#75697f, #9a8da6);
+  --rule: light-dark(#d8d0de, #332b3b);
+  --hover: light-dark(#e8e2ed, #201a27);
+  --lived: light-dark(#ddd5e3, #2a2332);
+  --field: light-dark(#faf8fb, #1c1722);
+  --f1: light-dark(#d6c3e6, #3a2650);
+  --f2: light-dark(#ae8ac9, #5e3b82);
+  --f3: light-dark(#7b4fa0, #9a6bc4);
+  --f4: light-dark(#4b2a6b, #d2b2ee);
+  --onfill: light-dark(#f8f3fb, #140f19);
+  --brass: light-dark(#c98a12, #e8b04a);
+}
+
+[data-palette="ledger"] {
+  --paper: light-dark(#fafaf7, #0e0e0e);
+  --ink: light-dark(#111111, #edede8);
+  --muted: light-dark(#6b6b66, #8e8e88);
+  --rule: light-dark(#d9d9d2, #2a2a28);
+  --hover: light-dark(#efefea, #191918);
+  --lived: light-dark(#e4e4dd, #222221);
+  --field: light-dark(#ffffff, #151514);
+  --f1: light-dark(#bdbdb6, #3a3a37);
+  --f2: light-dark(#8a8a83, #6a6a65);
+  --f3: light-dark(#4a4a45, #a8a8a2);
+  --f4: light-dark(#111111, #edede8);
+  --onfill: light-dark(#fafaf7, #0e0e0e);
+  --brass: light-dark(#d23f1e, #ff6a45);
+}
+
+/* Typefaces. */
+:root[data-font="besley"] {
+  --font: Besley, Georgia, serif;
+}
+
+:root[data-font="instrument"] {
+  --font: "Instrument Sans", system-ui, sans-serif;
+}
+
+:root[data-font="courier"] {
+  --font: "Courier Prime", "Courier New", monospace;
 }
 
 *,
@@ -83,7 +135,7 @@ body {
   margin: 0;
   background: var(--paper);
   color: var(--ink);
-  font-family: Spectral, Georgia, "Times New Roman", serif;
+  font-family: var(--font);
   font-size: 17px;
   line-height: 1.5;
   /* The windowed lists compensate scroll position themselves when prepending. */
@@ -157,7 +209,31 @@ dialog {
   animation-duration: 320ms;
 }
 
+/* During a morph, the old view clears out at once and the new view's other
+   sections (the next year, the neighbouring months) rise in as the zoomed
+   element settles, so only the thing you clicked appears to travel. */
+.vt-morph::view-transition-old(root) {
+  animation: vt-fade-out 120ms ease both;
+}
+
+.vt-morph::view-transition-new(root) {
+  animation: vt-rise-in 320ms var(--ease-out) 300ms both;
+}
+
 /* biome-ignore-end lint/correctness/noUnknownTypeSelector: end */
+
+@keyframes vt-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes vt-rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+}
 
 /* Dialogs rise and fade in, and fade out on close. */
 dialog {

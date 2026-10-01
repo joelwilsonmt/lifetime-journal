@@ -22,7 +22,12 @@ export function transition(
   }
   const src = from?.() as HTMLElement | null | undefined;
   let dst: HTMLElement | null = null;
-  if (src) src.style.viewTransitionName = MORPH;
+  const root = document.documentElement;
+  if (src) {
+    src.style.viewTransitionName = MORPH;
+    // Lets CSS hold the rest of the new view back until the morph lands.
+    root.classList.add('vt-morph');
+  }
   const t = document.startViewTransition(() => {
     if (src) src.style.viewTransitionName = '';
     flushSync(update);
@@ -31,6 +36,7 @@ export function transition(
   });
   t.finished.finally(() => {
     if (dst) dst.style.viewTransitionName = '';
+    root.classList.remove('vt-morph');
   });
 }
 
