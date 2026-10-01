@@ -13,6 +13,6 @@ export default defineConfig({
     // registered) share that origin.
     port: 3075,
     strictPort: true,
-    proxy: { '/api': 'http://127.0.0.1:3076' },
+    proxy: { '/api': `http://127.0.0.1:${process.env.API_PORT ?? 3076}` },
   },
 });

@@ -4,3 +4,4 @@ data
 .env
 *.log
 .playwright-mcp
+demo-data

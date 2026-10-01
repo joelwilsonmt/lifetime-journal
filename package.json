@@ -8,9 +8,13 @@
     "node": ">=22.18"
   },
   "scripts": {
-    "dev": "pnpm run --parallel \"/^dev:/\"",
+    "dev": "pnpm run --parallel \"/^dev:(client|server)$/\"",
     "dev:client": "vite",
     "dev:server": "PORT=3076 DATA_DIR=./data node --watch src/server/index.ts",
+    "dev:demo": "node src/server/cli/seed-demo.ts && pnpm run --parallel \"/^demo:(client|server)$/\"",
+    "demo:client": "API_PORT=3078 vite --port 3077",
+    "demo:server": "PORT=3078 DATA_DIR=./demo-data node --watch src/server/index.ts",
+    "demo:reset": "node src/server/cli/seed-demo.ts --reset",
     "build": "pnpm run build:client && pnpm run build:server",
     "build:client": "vite build",
     "build:server": "tsc -p tsconfig.server.json",
