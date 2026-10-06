@@ -23,7 +23,7 @@ RUN pnpm install --frozen-lockfile --prod
 FROM node:22-alpine AS runtime
 ARG VERSION=dev
 LABEL org.opencontainers.image.title="lifetime-journal" \
-      org.opencontainers.image.description="A daily journal laid out as a lifetime calendar" \
+      org.opencontainers.image.description="A self-hosted daily journal laid out as your whole life" \
       org.opencontainers.image.version="${VERSION}" \
       org.opencontainers.image.source="https://github.com/joelwilsonmt/lifetime-journal" \
       org.opencontainers.image.licenses="MIT"

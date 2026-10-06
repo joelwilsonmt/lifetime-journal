@@ -31,7 +31,7 @@ const server = serve(
   { fetch: app.fetch, port: config.port, hostname: config.host },
   info => {
     console.log(
-      `Lifetime calendar on http://${info.address}:${info.port} (data: ${config.dataDir}, ${days} days)`
+      `Lifetime Journal on http://${info.address}:${info.port} (data: ${config.dataDir}, ${days} days)`
     );
   }
 );

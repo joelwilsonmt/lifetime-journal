@@ -1,7 +1,7 @@
 {
-  "name": "Lifetime calendar",
+  "name": "Lifetime Journal",
   "short_name": "Lifetime",
-  "description": "A daily journal laid out as a lifetime calendar.",
+  "description": "A daily journal laid out as your whole life.",
   "start_url": "/?write",
   "scope": "/",
   "display": "standalone",

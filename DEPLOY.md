@@ -153,8 +153,8 @@ put the folder back and restart. To undo a cleared day, move its file from
 Use Settings → Import JSON in the app, or:
 
 ```sh
-cp lifetime-calendar-*.json data/
-docker compose exec lifetime-journal node dist/server/cli/import.js /data/lifetime-calendar-YYYY-MM-DD.json
+cp ~/Downloads/lifetime-calendar-2026-09-30.json data/export.json   # any JSON export
+docker compose exec lifetime-journal node dist/server/cli/import.js /data/export.json
 ```
 
 ## Hardening already in place

@@ -127,7 +127,7 @@ export function SettingsDialog({
       const data = await api.exportAll();
       if (kind === 'json') {
         download(
-          `lifetime-calendar-${today}.json`,
+          `lifetime-journal-${today}.json`,
           JSON.stringify(data, null, 2),
           'application/json'
         );
