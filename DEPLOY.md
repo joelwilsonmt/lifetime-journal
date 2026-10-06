@@ -11,9 +11,34 @@ One container, one `./data` folder, reachable only over your tailnet.
 The image is built for one CPU architecture. Most servers are `linux/amd64`
 (x86). Check with `uname -m`: `x86_64` means amd64, `aarch64` means arm64.
 
-## Option A: build on the server
+## Option A: pull the published image (recommended)
 
-Simplest if the server can reach the git repo.
+GitHub Actions builds the image for amd64 and arm64 and publishes it to
+`ghcr.io/joelwilsonmt/lifetime-calendar` on every push to `main` (`latest`,
+`sha-<commit>`) and on version tags (`1.2.3`, `1.2`). The server only needs
+the compose file and an `.env`:
+
+```sh
+mkdir -p /opt/docker/lifetime-calendar && cd /opt/docker/lifetime-calendar
+curl -fsSLO https://raw.githubusercontent.com/joelwilsonmt/lifetime-calendar/main/docker-compose.yml
+curl -fsSL  https://raw.githubusercontent.com/joelwilsonmt/lifetime-calendar/main/.env.example -o .env
+sed -i "s/^APP_UID=.*/APP_UID=$(id -u)/; s/^APP_GID=.*/APP_GID=$(id -g)/" .env
+mkdir -p data
+docker compose pull && docker compose up -d
+```
+
+Upgrade with `docker compose pull && docker compose up -d`. To control when
+upgrades happen, set `VERSION` in `.env` to a release (e.g. `1.0.0`) instead
+of `latest`.
+
+If the repository (and so the package) is private, log in once first with a
+token that has `read:packages`:
+`echo <token> | docker login ghcr.io -u joelwilsonmt --password-stdin`
+(and fetch the two files with that token, or copy them over by hand).
+
+## Option B: build on the server
+
+For running unreleased changes, or without GHCR.
 
 ```sh
 git clone <repo-url> /opt/docker/lifetime-calendar
@@ -26,7 +51,7 @@ docker compose up -d --build
 
 Update later with `git pull && docker compose up -d --build`.
 
-## Option B: build elsewhere, ship a tarball
+## Option C: build elsewhere, ship a tarball
 
 Useful when building on a laptop (including Apple Silicon, which cross-builds
 for amd64) and the server shouldn't need the source.
@@ -66,7 +91,8 @@ docker compose up -d
 | `BIND_ADDR` | `127.0.0.1` | Host address to publish on. See below. |
 | `HOST_PORT` | `3075` | Host port. Not 3000, which Gitea and others commonly use. |
 | `TRASH_DAYS` | `30` | How long cleared days stay in `data/.trash/`. |
-| `VERSION` | `latest` | Image tag to run. |
+| `IMAGE` | `ghcr.io/joelwilsonmt/lifetime-calendar` | Image to run. |
+| `VERSION` | `latest` | Image tag: `latest`, a release like `1.0.0`, or `sha-<commit>`. |
 
 ## Reaching it (tailnet only)
 
@@ -87,6 +113,14 @@ Cloudflare Tunnel or a public reverse proxy. There's no login in v1.
 
 - **Direct:** set `BIND_ADDR` to the server's Tailscale IP (`tailscale ip -4`)
   and open `http://<that-ip>:3075`. Plain HTTP, so no phone install.
+
+## Releases
+
+Push a tag to publish a versioned image:
+
+```sh
+git tag v1.0.0 && git push origin v1.0.0
+```
 
 ## Checking on it
 

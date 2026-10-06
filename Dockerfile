@@ -1,6 +1,11 @@
 # syntax=docker/dockerfile:1
 
-FROM node:22-alpine AS base
+# The build stages run on the builder's own platform ($BUILDPLATFORM), even
+# when producing an image for another architecture: the output is plain JS and
+# every runtime dependency is pure JS (no native addons), so node_modules is
+# the same on amd64 and arm64. Only the small runtime stage is per-platform.
+# This keeps multi-arch builds from running pnpm/Vite under emulation.
+FROM --platform=$BUILDPLATFORM node:22-alpine AS base
 WORKDIR /app
 RUN corepack enable
 COPY package.json pnpm-lock.yaml ./
@@ -19,7 +24,9 @@ FROM node:22-alpine AS runtime
 ARG VERSION=dev
 LABEL org.opencontainers.image.title="lifetime-calendar" \
       org.opencontainers.image.description="A daily journal laid out as a lifetime calendar" \
-      org.opencontainers.image.version="${VERSION}"
+      org.opencontainers.image.version="${VERSION}" \
+      org.opencontainers.image.source="https://github.com/joelwilsonmt/lifetime-calendar" \
+      org.opencontainers.image.licenses="NOASSERTION"
 ENV NODE_ENV=production \
     PORT=3000 \
     DATA_DIR=/data \

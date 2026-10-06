@@ -1,9 +1,10 @@
 # Settings come from .env next to this file (see .env.example).
-#   Build on the server:     docker compose up -d --build
-#   Prebuilt image tarball:  docker load < lifetime-calendar-*.tar.gz && docker compose up -d
+#   Pull the published image:  docker compose pull && docker compose up -d
+#   Build from source instead: docker compose up -d --build
+#   Load a tarball:            gunzip -c lifetime-calendar-*.tar.gz | docker load && docker compose up -d
 services:
   lifetime-calendar:
-    image: lifetime-calendar:${VERSION:-latest}
+    image: ${IMAGE:-ghcr.io/joelwilsonmt/lifetime-calendar}:${VERSION:-latest}
     build:
       context: .
       args:

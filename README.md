@@ -1,5 +1,8 @@
 # Lifetime calendar
 
+[![CI](https://github.com/joelwilsonmt/lifetime-calendar/actions/workflows/ci.yml/badge.svg)](https://github.com/joelwilsonmt/lifetime-calendar/actions/workflows/ci.yml)
+[![Docker image](https://github.com/joelwilsonmt/lifetime-calendar/actions/workflows/docker.yml/badge.svg)](https://github.com/joelwilsonmt/lifetime-calendar/actions/workflows/docker.yml)
+
 A self-hosted daily journal laid out as a zoomable lifetime calendar. Each day
 is a markdown file, so `data/journal` doubles as an Obsidian vault.
 
@@ -43,16 +46,24 @@ The server runs straight from TypeScript in dev (Node >= 22.18 strips types).
 
 ## Deploy
 
-See [DEPLOY.md](DEPLOY.md). Short version, on the server:
+Images for amd64 and arm64 are published to
+`ghcr.io/joelwilsonmt/lifetime-calendar` by GitHub Actions. On a server:
 
 ```sh
-cp .env.example .env    # set APP_UID/APP_GID to the owner of ./data
-docker compose up -d --build
+mkdir -p /opt/docker/lifetime-calendar && cd /opt/docker/lifetime-calendar
+curl -fsSLO https://raw.githubusercontent.com/joelwilsonmt/lifetime-calendar/main/docker-compose.yml
+curl -fsSL  https://raw.githubusercontent.com/joelwilsonmt/lifetime-calendar/main/.env.example -o .env
+# set APP_UID/APP_GID in .env to the owner of ./data (id -u / id -g)
+mkdir -p data && docker compose up -d
 sudo tailscale serve --bg --https=443 http://127.0.0.1:3075
 ```
 
-Or build an image tarball elsewhere with `scripts/package-image.sh` and ship
-it with `scripts/deploy.sh user@server`.
+[DEPLOY.md](DEPLOY.md) covers building from source, shipping a tarball with
+`scripts/package-image.sh` + `scripts/deploy.sh`, releases, and backups.
+
+CI (`.github/workflows/ci.yml`) runs lint, typecheck, unit and Playwright
+tests on every push and PR. The Docker workflow builds both architectures,
+smoke-tests the amd64 image, and publishes on `main` and `v*` tags.
 
 ### Install on a phone
 

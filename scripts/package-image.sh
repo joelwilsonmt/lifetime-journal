@@ -7,19 +7,21 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 PLATFORM="${PLATFORM:-linux/amd64}"
+# Same name compose uses, so a loaded tarball is picked up without pulling.
+IMAGE="${IMAGE:-ghcr.io/joelwilsonmt/lifetime-calendar}"
 VERSION="$(git describe --tags --always --dirty)"
 ARCH="${PLATFORM#linux/}"
 OUT="release/lifetime-calendar-${VERSION}-${ARCH}.tar.gz"
 
-echo "Building lifetime-calendar:${VERSION} for ${PLATFORM}"
+echo "Building ${IMAGE}:${VERSION} for ${PLATFORM}"
 docker buildx build \
   --platform "$PLATFORM" \
   --build-arg "VERSION=${VERSION}" \
-  -t "lifetime-calendar:${VERSION}" \
-  -t lifetime-calendar:latest \
+  -t "${IMAGE}:${VERSION}" \
+  -t "${IMAGE}:latest" \
   --load .
 
 mkdir -p release
-docker save "lifetime-calendar:${VERSION}" lifetime-calendar:latest | gzip > "$OUT"
+docker save "${IMAGE}:${VERSION}" "${IMAGE}:latest" | gzip > "$OUT"
 cp docker-compose.yml .env.example release/
 echo "Wrote $OUT ($(du -h "$OUT" | cut -f1)) plus docker-compose.yml and .env.example"

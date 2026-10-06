@@ -1,7 +1,7 @@
 {
   "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
   "files": {
-    "includes": ["**", "!dist", "!data", "!prototype"]
+    "includes": ["**", "!prototype"]
   },
   "formatter": {
     "indentStyle": "space",
@@ -17,7 +17,9 @@
     }
   },
   "css": {
-    "parser": { "cssModules": true }
+    "parser": {
+      "cssModules": true
+    }
   },
   "linter": {
     "rules": {
@@ -26,5 +28,10 @@
         "noUnusedVariables": "error"
       }
     }
+  },
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true
   }
 }
