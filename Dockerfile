@@ -5,7 +5,7 @@
 # every runtime dependency is pure JS (no native addons), so node_modules is
 # the same on amd64 and arm64. Only the small runtime stage is per-platform.
 # This keeps multi-arch builds from running pnpm/Vite under emulation.
-FROM --platform=$BUILDPLATFORM node:22-alpine AS base
+FROM --platform=$BUILDPLATFORM node:26-alpine AS base
 WORKDIR /app
 RUN corepack enable
 COPY package.json pnpm-lock.yaml ./
@@ -20,7 +20,7 @@ RUN pnpm build
 FROM base AS prod-deps
 RUN pnpm install --frozen-lockfile --prod
 
-FROM node:22-alpine AS runtime
+FROM node:26-alpine AS runtime
 ARG VERSION=dev
 LABEL org.opencontainers.image.title="lifetime-journal" \
       org.opencontainers.image.description="A self-hosted daily journal laid out as your whole life" \
