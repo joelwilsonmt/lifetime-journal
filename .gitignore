@@ -5,3 +5,6 @@ data
 *.log
 .playwright-mcp
 demo-data
+.e2e-data
+test-results
+playwright-report

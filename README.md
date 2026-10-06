@@ -30,7 +30,9 @@ pnpm install
 pnpm dev          # http://localhost:3075 (API on :3076, data in ./data)
 pnpm dev:demo     # http://localhost:3077 with sample data in ./demo-data
 pnpm demo:reset   # wipe and re-seed the sample data
-pnpm test         # server + storage tests
+pnpm test         # unit tests (server, storage, week math)
+pnpm test:e2e     # build, then Playwright against the production server
+                  # (desktop + phone viewports, fresh .e2e-data/ each run)
 pnpm typecheck
 pnpm check        # Biome lint + format check (pnpm format to fix)
 ```
