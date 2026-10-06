@@ -9,13 +9,6 @@
   color-scheme: light dark;
   --backdrop: rgb(10 14 14 / 0.45);
   --font: Spectral, Georgia, "Times New Roman", serif;
-  /* Era hues: muted, kept clear of the pine fill ramp and the brass. */
-  --era-0: light-dark(#5b7ca6, #7d9cc6);
-  --era-1: light-dark(#b0644a, #cf8466);
-  --era-2: light-dark(#8a5e8e, #ae84b2);
-  --era-3: light-dark(#7a6a58, #a6927c);
-  --era-4: light-dark(#a0526b, #c87a92);
-  --era-5: light-dark(#4a7f8c, #6fa6b3);
 
   box-sizing: border-box;
   padding-top: env(safe-area-inset-top, 0px);
@@ -46,6 +39,13 @@
   --f4: light-dark(#22523f, #8bd0b0);
   --onfill: light-dark(#f4f7f2, #0f1413);
   --brass: light-dark(#a87a1e, #d6a947);
+  /* Era hues: kept clear of this theme's fill ramp and today accent. */
+  --era-0: light-dark(#5b7ca6, #7d9cc6);
+  --era-1: light-dark(#b0644a, #cf8466);
+  --era-2: light-dark(#8a5e8e, #ae84b2);
+  --era-3: light-dark(#7a6a58, #a6927c);
+  --era-4: light-dark(#a0526b, #c87a92);
+  --era-5: light-dark(#4a6f9c, #6f95c4);
 }
 
 [data-palette="ember"] {
@@ -62,6 +62,13 @@
   --f4: light-dark(#7a3418, #f2a672);
   --onfill: light-dark(#fff6ee, #1a1210);
   --brass: light-dark(#1f6f6b, #4fb3aa);
+  /* Era hues: kept clear of this theme's fill ramp and today accent. */
+  --era-0: light-dark(#5b6fa6, #8297cf);
+  --era-1: light-dark(#6f7d3c, #a3b366);
+  --era-2: light-dark(#8a5e8e, #b386b8);
+  --era-3: light-dark(#a8862b, #d4ad4c);
+  --era-4: light-dark(#5d6b78, #8e9cab);
+  --era-5: light-dark(#b0567a, #d27fa0);
 }
 
 [data-palette="tide"] {
@@ -78,6 +85,13 @@
   --f4: light-dark(#1e4778, #9cc8f2);
   --onfill: light-dark(#f3f7fb, #0d1218);
   --brass: light-dark(#d9603b, #f08a63);
+  /* Era hues: kept clear of this theme's fill ramp and today accent. */
+  --era-0: light-dark(#6f7d3c, #a3b366);
+  --era-1: light-dark(#8a5e8e, #b386b8);
+  --era-2: light-dark(#7a6a58, #a6927c);
+  --era-3: light-dark(#a8862b, #d4ad4c);
+  --era-4: light-dark(#4f8a5b, #79b886);
+  --era-5: light-dark(#a0526b, #c87a92);
 }
 
 [data-palette="dusk"] {
@@ -94,6 +108,13 @@
   --f4: light-dark(#4b2a6b, #d2b2ee);
   --onfill: light-dark(#f8f3fb, #140f19);
   --brass: light-dark(#c98a12, #e8b04a);
+  /* Era hues: kept clear of this theme's fill ramp and today accent. */
+  --era-0: light-dark(#5b7ca6, #7d9cc6);
+  --era-1: light-dark(#b0644a, #cf8466);
+  --era-2: light-dark(#4f8a5b, #79b886);
+  --era-3: light-dark(#4a7f8c, #6fa6b3);
+  --era-4: light-dark(#7a6a58, #a6927c);
+  --era-5: light-dark(#6f7d3c, #a3b366);
 }
 
 [data-palette="ledger"] {
@@ -110,6 +131,13 @@
   --f4: light-dark(#111111, #edede8);
   --onfill: light-dark(#fafaf7, #0e0e0e);
   --brass: light-dark(#d23f1e, #ff6a45);
+  /* Era hues: kept clear of this theme's fill ramp and today accent. */
+  --era-0: light-dark(#3f63a6, #7a9be0);
+  --era-1: light-dark(#3f7f52, #6fc08a);
+  --era-2: light-dark(#7a4f9a, #b08ad4);
+  --era-3: light-dark(#a07a1e, #d9ad4a);
+  --era-4: light-dark(#2f7f86, #5fbac2);
+  --era-5: light-dark(#7a5a40, #b8946f);
 }
 
 /* Typefaces. */

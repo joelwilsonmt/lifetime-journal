@@ -92,7 +92,10 @@ updated: 2026-09-30T18:06:30.300Z
 The note body.
 ```
 
-Clearing a day deletes its file. Extra frontmatter keys added in Obsidian are
+Clearing a day moves its file to `data/.trash/YYYY-MM-DD.deleted-<ms>.md`.
+Move it back to `journal/YYYY/MM/YYYY-MM-DD.md` to restore it. The trash is
+pruned on startup and on each delete: entries older than `TRASH_DAYS`
+(default 30) go, and at most 500 are kept. Extra frontmatter keys added in Obsidian are
 kept on rewrite, and edits made outside the app show up on the next load.
 
 ## API

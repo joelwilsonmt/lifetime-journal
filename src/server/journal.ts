@@ -16,6 +16,7 @@ import {
   updatedOf,
 } from './frontmatter.ts';
 import { isNotFound, writeFileAtomic } from './fsutil.ts';
+import type { Trash } from './trash.ts';
 
 interface CacheItem {
   version: string;
@@ -48,8 +49,12 @@ export class Journal {
   private scanning: Promise<Map<string, CacheItem>> | null = null;
   private locks = new Map<string, Promise<unknown>>();
 
-  constructor(root: string) {
+  /** Where cleared days go. Without one, clearing deletes outright. */
+  readonly trash: Trash | null;
+
+  constructor(root: string, trash: Trash | null = null) {
     this.root = path.resolve(root);
+    this.trash = trash;
   }
 
   /** The only place a file path is built from a date. */
@@ -189,7 +194,8 @@ export class Journal {
 
   private async removeUnlocked(date: string): Promise<void> {
     const file = this.pathFor(date);
-    await rm(file, { force: true });
+    if (this.trash) await this.trash.put(file, date);
+    else await rm(file, { force: true });
     this.cache.delete(date);
     // Tidy empty month/year folders; rmdir fails harmlessly if not empty.
     const monthDir = path.dirname(file);

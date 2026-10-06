@@ -6,10 +6,13 @@ import { createApp } from './app.ts';
 import { config } from './config.ts';
 import { Journal } from './journal.ts';
 import { SettingsStore } from './settings.ts';
+import { Trash } from './trash.ts';
 
 await mkdir(config.journalDir, { recursive: true });
 
-const journal = new Journal(config.journalDir);
+const trash = new Trash(config.trashDir, { maxAgeDays: config.trashDays });
+await trash.prune();
+const journal = new Journal(config.journalDir, trash);
 const settings = new SettingsStore(config.dataDir);
 
 // In production this file runs from dist/server, next to dist/client.

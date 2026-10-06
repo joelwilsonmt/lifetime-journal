@@ -7,4 +7,6 @@ export const config = {
   host: process.env.HOST ?? '0.0.0.0',
   dataDir,
   journalDir: path.join(dataDir, 'journal'),
+  trashDir: path.join(dataDir, '.trash'),
+  trashDays: Number(process.env.TRASH_DAYS ?? 30),
 };

@@ -14,6 +14,7 @@ import { createApp } from './app.ts';
 import { parseDay, serializeDay } from './frontmatter.ts';
 import { Journal } from './journal.ts';
 import { SettingsStore } from './settings.ts';
+import { Trash } from './trash.ts';
 
 let dir: string;
 let journal: Journal;
@@ -118,6 +119,51 @@ describe('journal', () => {
       'x'
     );
     expect((await journal.summary()).days).toEqual({});
+  });
+});
+
+describe('trash', () => {
+  it('moves cleared days to the trash instead of deleting them', async () => {
+    const trash = new Trash(path.join(dir, '.trash'));
+    const j = new Journal(path.join(dir, 'journal'), trash);
+    await j.write('2024-05-01', { note: 'keep me', activities: [] });
+    await j.write('2024-05-01', { note: '', activities: [] });
+    const { readdir } = await import('node:fs/promises');
+    const names = await readdir(path.join(dir, '.trash'));
+    expect(names).toHaveLength(1);
+    expect(names[0]).toMatch(/^2024-05-01\.deleted-\d+\.md$/);
+    expect(
+      await readFile(path.join(dir, '.trash', names[0] as string), 'utf8')
+    ).toContain('keep me');
+    expect((await j.summary()).days).toEqual({});
+  });
+  it('prunes by age and by count', async () => {
+    const t = new Trash(path.join(dir, '.trash'), {
+      maxAgeDays: 30,
+      maxFiles: 2,
+    });
+    await mkdir(t.dir, { recursive: true });
+    const now = Date.UTC(2026, 9, 6);
+    const day = 864e5;
+    for (const [d, age] of [
+      ['2024-01-01', 40],
+      ['2024-01-02', 3],
+      ['2024-01-03', 2],
+      ['2024-01-04', 1],
+    ] as const) {
+      await writeFile(
+        path.join(t.dir, `${d}.deleted-${now - age * day}.md`),
+        'x'
+      );
+    }
+    await writeFile(path.join(t.dir, 'notes.txt'), 'not ours');
+    expect(await t.prune(now)).toBe(2);
+    const { readdir } = await import('node:fs/promises');
+    expect((await readdir(t.dir)).sort()).toEqual([
+      `2024-01-03.deleted-${now - 2 * day}.md`,
+      `2024-01-04.deleted-${now - 1 * day}.md`,
+      'notes.txt',
+    ]);
   });
 });
 
