@@ -124,3 +124,7 @@ kept on rewrite, and edits made outside the app show up on the next load.
 
 There's no auth in v1. The seam is `src/server/auth.ts`, which every `/api` route
 except health goes through.
+
+## License
+
+MIT. See [LICENSE](LICENSE).
