@@ -41,24 +41,23 @@ The server runs straight from TypeScript in dev (Node >= 22.18 strips types).
 `pnpm build` bundles the client to `dist/client` and compiles the server to
 `dist/server`; `pnpm start` serves both on :3000.
 
-## Deploy (homelab)
+## Deploy
+
+See [DEPLOY.md](DEPLOY.md). Short version, on the server:
 
 ```sh
-cp .env.example .env    # set APP_UID/APP_GID to the owner of ./data, BIND_ADDR
+cp .env.example .env    # set APP_UID/APP_GID to the owner of ./data
 docker compose up -d --build
+sudo tailscale serve --bg --https=443 http://127.0.0.1:3075
 ```
 
-- Data lives in `./data` (mounted at `/data`), so the restic backups pick it up.
-- The container runs as `APP_UID:APP_GID`, so files on the host are owned by you.
-- Tailnet only: set `BIND_ADDR` to the server's Tailscale IP (`tailscale ip -4`),
-  or keep `127.0.0.1` and run `tailscale serve --bg 3000` for HTTPS on the
-  tailnet name.
-- Healthcheck: `GET /api/health`. It also fails if `/data` isn't writable.
+Or build an image tarball elsewhere with `scripts/package-image.sh` and ship
+it with `scripts/deploy.sh user@server`.
 
 ### Install on a phone
 
 The app is installable (manifest, icons, no service worker). Browsers only
-offer install over HTTPS, so serve it with `tailscale serve --bg 3000` and open
+offer install over HTTPS, so serve it with `tailscale serve --bg --https=443 http://127.0.0.1:3075` and open
 `https://<server>.<tailnet>.ts.net` on the phone, then use "Add to Home
 Screen". The installed app opens straight to today's entry (`/?write`). In the
 editor, swipe left or right to move between days.

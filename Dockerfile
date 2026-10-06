@@ -16,20 +16,23 @@ FROM base AS prod-deps
 RUN pnpm install --frozen-lockfile --prod
 
 FROM node:22-alpine AS runtime
-# Match these to the owner of ./data on the host so files stay readable
-# by restic, Obsidian, etc.
-ARG APP_UID=1000
-ARG APP_GID=1000
+ARG VERSION=dev
+LABEL org.opencontainers.image.title="lifetime-calendar" \
+      org.opencontainers.image.description="A daily journal laid out as a lifetime calendar" \
+      org.opencontainers.image.version="${VERSION}"
 ENV NODE_ENV=production \
     PORT=3000 \
     DATA_DIR=/data \
-    HOME=/tmp
+    HOME=/tmp \
+    APP_VERSION=${VERSION}
 WORKDIR /app
 COPY --from=prod-deps /app/node_modules ./node_modules
 COPY --from=build /app/dist ./dist
 COPY package.json ./
-RUN mkdir -p /data && chown ${APP_UID}:${APP_GID} /data
-USER ${APP_UID}:${APP_GID}
+# Non-root by default. Compose overrides the UID/GID at runtime (`user:`) to
+# match whoever owns ./data on the host, so one image works on any server.
+RUN mkdir -p /data && chown 1000:1000 /data
+USER 1000:1000
 EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
   CMD node -e "fetch('http://127.0.0.1:'+process.env.PORT+'/api/health').then(r=>process.exit(r.ok?0:1),()=>process.exit(1))"

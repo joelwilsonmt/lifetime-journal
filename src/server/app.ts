@@ -57,7 +57,7 @@ export function createApp({ journal, settings, staticRoot }: AppDeps) {
   app.get('/api/health', async c => {
     try {
       await access(path.dirname(journal.root), constants.W_OK);
-      return c.json({ ok: true });
+      return c.json({ ok: true, version: process.env.APP_VERSION ?? 'dev' });
     } catch {
       return c.json({ ok: false, error: 'Data directory not writable' }, 503);
     }
