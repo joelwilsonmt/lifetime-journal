@@ -8,10 +8,10 @@ cd "$(dirname "$0")/.."
 
 PLATFORM="${PLATFORM:-linux/amd64}"
 # Same name compose uses, so a loaded tarball is picked up without pulling.
-IMAGE="${IMAGE:-ghcr.io/joelwilsonmt/lifetime-calendar}"
+IMAGE="${IMAGE:-ghcr.io/joelwilsonmt/lifetime-journal}"
 VERSION="$(git describe --tags --always --dirty)"
 ARCH="${PLATFORM#linux/}"
-OUT="release/lifetime-calendar-${VERSION}-${ARCH}.tar.gz"
+OUT="release/lifetime-journal-${VERSION}-${ARCH}.tar.gz"
 
 echo "Building ${IMAGE}:${VERSION} for ${PLATFORM}"
 docker buildx build \

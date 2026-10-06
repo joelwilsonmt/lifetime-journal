@@ -1,6 +1,6 @@
 // One-time import of a prototype JSON export into markdown files.
 //   pnpm import path/to/lifetime-calendar-YYYY-MM-DD.json
-//   docker compose exec lifetime-calendar node dist/server/cli/import.js /data/export.json
+//   docker compose exec lifetime-journal node dist/server/cli/import.js /data/export.json
 import { readFile } from 'node:fs/promises';
 import { config } from '../config.ts';
 import { exportSchema, importExport } from '../importer.ts';

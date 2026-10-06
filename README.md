@@ -1,98 +1,89 @@
-# Lifetime calendar
+# Lifetime Journal
 
-[![CI](https://github.com/joelwilsonmt/lifetime-calendar/actions/workflows/ci.yml/badge.svg)](https://github.com/joelwilsonmt/lifetime-calendar/actions/workflows/ci.yml)
-[![Docker image](https://github.com/joelwilsonmt/lifetime-calendar/actions/workflows/docker.yml/badge.svg)](https://github.com/joelwilsonmt/lifetime-calendar/actions/workflows/docker.yml)
+[![CI](https://github.com/joelwilsonmt/lifetime-journal/actions/workflows/ci.yml/badge.svg)](https://github.com/joelwilsonmt/lifetime-journal/actions/workflows/ci.yml)
+[![Docker image](https://github.com/joelwilsonmt/lifetime-journal/actions/workflows/docker.yml/badge.svg)](https://github.com/joelwilsonmt/lifetime-journal/actions/workflows/docker.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-A self-hosted daily journal laid out as a zoomable lifetime calendar. Each day
-is a markdown file, so `data/journal` doubles as an Obsidian vault.
+A self-hosted daily journal laid out as your whole life. See about 75 years at
+once, zoom into a year, a month, a day, and write. Lived time is filled in,
+the time you have left is outlined, and each day is shaded by how much you
+wrote. A small memento mori that also happens to be a journal.
 
-## Using it
+Every day is a plain markdown file, so the data folder doubles as an Obsidian
+vault, and the whole thing runs as one Docker container on your own server.
 
-- **Views:** Life (years), Weeks (each year of age as 52 weeks from that
-  birthday, shown 52, 26 or 13 per row), Year, and Month. Keys: `1`–`4` switch views, `N` writes today, `T`
-  jumps to today, `/` searches, and `Esc` zooms out.
-- On phones, Today, Search, the lens, eras and Settings are in the menu (☰).
-  Dialogs close with ×, by tapping outside, or with Esc.
-- **Write** opens today's entry. It autosaves, and the status next to Done
-  shows whether it has saved.
-- **Showing** (in the header) is a lens. Pick an activity and every view shades
-  only the days that have it, with counts per year and month.
-- **Eras and milestones** (on the Life view, or in Settings) label stretches of
-  life and single days on the calendar.
-- **Appearance** (Settings): five themes (Pine, Ember, Tide, Dusk, Ledger),
-  system/light/dark mode, and four typefaces. Saved with your settings, so
-  every device matches.
-- **Conflicts:** if a day was changed on another device or in Obsidian while
-  you had it open, the editor asks which version to keep instead of
-  overwriting it.
+![Life view: every year as a tile, with eras across the top and month bars showing how much was written](docs/screenshots/life.png)
 
-## Develop
+| | |
+| --- | --- |
+| ![Year view with twelve mini month calendars](docs/screenshots/year.png) | ![Month view with the day editor open](docs/screenshots/editor.png) |
+| **Year:** twelve months at a glance. | **Day editor:** a note and activities, saved as you type. |
+| ![Weeks view, one row per year of age](docs/screenshots/weeks.png) | ![The Ember theme in dark mode](docs/screenshots/theme-ember-dark.png) |
+| **Weeks:** your life in weeks, from each birthday. | **Themes:** five palettes, light or dark, four typefaces. |
+
+<p align="center">
+  <img src="docs/screenshots/phone-month.png" alt="Month view on a phone" width="260">
+  &nbsp;&nbsp;
+  <img src="docs/screenshots/phone-weeks.png" alt="Weeks view on a phone" width="260">
+</p>
+
+## Features
+
+- **Four zoom levels on one continuous scroll:** Life, Weeks, Year and Month.
+  Zooming keeps your place, and the thing you click grows into what it opens.
+- **A fast daily habit:** *Write* (or `N`) opens today. Notes autosave, with a
+  visible save status. Swipe or use ‹ › to move between days.
+- **Activities** you choose (Workout, Read, Outside…) as one-tap chips, and an
+  activity **lens** that shades only the days with that activity.
+- **Eras and milestones:** label stretches of life (a city, a school, a job)
+  and single days; they're drawn across the calendar.
+- **Search** across every note and activity (`/`).
+- **Plain markdown storage**, one file per day, editable in Obsidian or any
+  editor. Edits made outside the app show up, and the app catches conflicts
+  instead of overwriting them.
+- **Forgiving:** clearing a day moves it to a trash folder for 30 days.
+- **Themes:** Pine, Ember, Tide, Dusk and Ledger, each light and dark, plus
+  Spectral, Besley, Instrument Sans or Courier Prime. Synced across devices.
+- **Installable** on phones as an app (over HTTPS), opening straight to
+  today's entry.
+- **Keyboard:** `1`–`4` switch views, `N` writes today, `T` jumps to today,
+  `/` searches, `Esc` zooms out.
+
+## Install with Docker
+
+Images for `linux/amd64` and `linux/arm64` are published to
+`ghcr.io/joelwilsonmt/lifetime-journal` on every push to `main` and on version
+tags. On your server:
 
 ```sh
-pnpm install
-pnpm dev          # http://localhost:3075 (API on :3076, data in ./data)
-pnpm dev:demo     # http://localhost:3077 with sample data in ./demo-data
-pnpm demo:reset   # wipe and re-seed the sample data
-pnpm test         # unit tests (server, storage, week math)
-pnpm test:e2e     # build, then Playwright against the production server
-                  # (desktop + phone viewports, fresh .e2e-data/ each run)
-pnpm typecheck
-pnpm check        # Biome lint + format check (pnpm format to fix)
+mkdir -p /opt/docker/lifetime-journal && cd /opt/docker/lifetime-journal
+curl -fsSLO https://raw.githubusercontent.com/joelwilsonmt/lifetime-journal/main/docker-compose.yml
+curl -fsSL  https://raw.githubusercontent.com/joelwilsonmt/lifetime-journal/main/.env.example -o .env
+sed -i "s/^APP_UID=.*/APP_UID=$(id -u)/; s/^APP_GID=.*/APP_GID=$(id -g)/" .env
+mkdir -p data
+docker compose up -d
 ```
 
-The server runs straight from TypeScript in dev (Node >= 22.18 strips types).
-`pnpm build` bundles the client to `dist/client` and compiles the server to
-`dist/server`; `pnpm start` serves both on :3000.
-
-## Deploy
-
-Images for amd64 and arm64 are published to
-`ghcr.io/joelwilsonmt/lifetime-calendar` by GitHub Actions. On a server:
+It listens on `127.0.0.1:3075`. There's no login, so keep it private: the
+intended setup is [Tailscale](https://tailscale.com), which also provides the
+HTTPS that phones need to install it:
 
 ```sh
-mkdir -p /opt/docker/lifetime-calendar && cd /opt/docker/lifetime-calendar
-curl -fsSLO https://raw.githubusercontent.com/joelwilsonmt/lifetime-calendar/main/docker-compose.yml
-curl -fsSL  https://raw.githubusercontent.com/joelwilsonmt/lifetime-calendar/main/.env.example -o .env
-# set APP_UID/APP_GID in .env to the owner of ./data (id -u / id -g)
-mkdir -p data && docker compose up -d
 sudo tailscale serve --bg --https=443 http://127.0.0.1:3075
+# → https://<server>.<tailnet>.ts.net
 ```
 
-[DEPLOY.md](DEPLOY.md) covers building from source, shipping a tarball with
-`scripts/package-image.sh` + `scripts/deploy.sh`, releases, and backups.
+Upgrade with `docker compose pull && docker compose up -d`, or pin `VERSION`
+in `.env` to a release. [DEPLOY.md](DEPLOY.md) covers every setting, building
+from source, shipping an image without a registry, backups and restores.
 
-CI (`.github/workflows/ci.yml`) runs lint, typecheck, unit and Playwright
-tests on every push and PR. The Docker workflow builds both architectures,
-smoke-tests the amd64 image, and publishes on `main` and `v*` tags.
-
-### Install on a phone
-
-The app is installable (manifest, icons, no service worker). Browsers only
-offer install over HTTPS, so serve it with `tailscale serve --bg --https=443 http://127.0.0.1:3075` and open
-`https://<server>.<tailnet>.ts.net` on the phone, then use "Add to Home
-Screen". The installed app opens straight to today's entry (`/?write`). In the
-editor, swipe left or right to move between days.
-
-## Import from the prototype
-
-Export JSON from the prototype's Settings, then either use **Settings → Import
-JSON** in the app, or:
-
-```sh
-cp lifetime-calendar-*.json data/
-docker compose exec lifetime-calendar node dist/server/cli/import.js /data/lifetime-calendar-YYYY-MM-DD.json
-# locally: pnpm import path/to/export.json
-```
-
-Imported days overwrite existing ones with the same date. Settings are only
-applied if no birth date is set yet.
-
-## Data layout
+## Your data
 
 ```
 data/
-  settings.json
-  journal/2026/09/2026-09-30.md
+  settings.json                     birth date, activities, eras, theme…
+  journal/2026/09/2026-09-30.md     one file per day
+  .trash/                           cleared days, kept 30 days
 ```
 
 ```markdown
@@ -101,30 +92,62 @@ activities: [Workout, Read]
 updated: 2026-09-30T18:06:30.300Z
 ---
 
-The note body.
+Walked the river trail before work; the cottonwoods are turning.
 ```
 
-Clearing a day moves its file to `data/.trash/YYYY-MM-DD.deleted-<ms>.md`.
-Move it back to `journal/YYYY/MM/YYYY-MM-DD.md` to restore it. The trash is
-pruned on startup and on each delete: entries older than `TRASH_DAYS`
-(default 30) go, and at most 500 are kept. Extra frontmatter keys added in Obsidian are
-kept on rewrite, and edits made outside the app show up on the next load.
+Back up the `data` folder and you have everything. Extra frontmatter you add
+in Obsidian is kept when the app rewrites a file. To restore a cleared day,
+move it from `data/.trash/` back to `data/journal/YYYY/MM/YYYY-MM-DD.md`.
 
-## API
+The original single-file prototype (`prototype/index.html`) kept entries in the
+browser. Its JSON export imports through **Settings → Import JSON**, or:
+
+```sh
+docker compose exec lifetime-journal node dist/server/cli/import.js /data/export.json
+```
+
+## Development
+
+Requires Node 22.18+ and pnpm (`corepack enable`).
+
+```sh
+pnpm install
+pnpm dev          # http://localhost:3075, data in ./data
+pnpm dev:demo     # http://localhost:3077, sample data in ./demo-data
+pnpm test         # unit tests
+pnpm test:e2e     # build, then Playwright (desktop + phone) on a fresh data dir
+pnpm typecheck
+pnpm check        # Biome lint + format (pnpm format to fix)
+pnpm screenshots  # regenerate docs/screenshots from the demo (run dev:demo first)
+```
+
+Stack: React 19 + Vite + CSS Modules on the front, a small Hono server on
+Node, TypeScript throughout, Zod for validation, Vitest and Playwright for
+tests. The server runs straight from TypeScript in development (Node strips
+the types) and is compiled with `tsc` for production.
+
+```
+src/client   React app: views, dialogs, styles (themes in styles/global.css)
+src/server   Hono API, markdown storage, trash, settings, import CLI
+src/shared   Date helpers, intensity level, types shared by both
+e2e/         Playwright tests
+```
+
+### API
 
 | Method | Path | |
 | --- | --- | --- |
-| GET | `/api/summary` | `{ days: { date: level }, activities: { date: [..] } }` for every day with an entry |
-| GET/PUT/DELETE | `/api/days/:date` | One day, with a `version`. PUT `{ note, activities, base? }`; an empty note and no activities deletes it. If `base` (or `?base=` on DELETE) doesn't match the file's current version, the response is 409 with `current` |
+| GET | `/api/summary` | Every day with an entry: `{ days: { date: level }, activities: { date: [...] } }` |
+| GET / PUT / DELETE | `/api/days/:date` | One day. PUT `{ note, activities, base? }`. An empty day moves to the trash. A stale `base` version returns 409 with the current entry. |
 | GET | `/api/search?q=` | Days whose note or activities contain every term, newest first |
-| GET/PUT | `/api/settings` | `{ birth, span, activities, eras, milestones }` |
-| GET | `/api/export` | Everything, in the prototype's JSON format |
-| POST | `/api/import` | Load a prototype JSON export |
-| GET | `/api/health` | Liveness + data-dir writability (no auth) |
+| GET / PUT | `/api/settings` | Birth date, span, activities, eras, milestones, appearance |
+| GET | `/api/export` | Everything, as JSON |
+| POST | `/api/import` | Load a JSON export |
+| GET | `/api/health` | Liveness, data-folder writability and version |
 
-There's no auth in v1. The seam is `src/server/auth.ts`, which every `/api` route
-except health goes through.
+There's no authentication. Every `/api` route except health passes through
+`src/server/auth.ts`, which is where it would go.
 
 ## License
 
-MIT. See [LICENSE](LICENSE).
+[MIT](LICENSE) © Joel Wilson

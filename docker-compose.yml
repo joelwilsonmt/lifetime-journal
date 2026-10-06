@@ -1,15 +1,15 @@
 # Settings come from .env next to this file (see .env.example).
 #   Pull the published image:  docker compose pull && docker compose up -d
 #   Build from source instead: docker compose up -d --build
-#   Load a tarball:            gunzip -c lifetime-calendar-*.tar.gz | docker load && docker compose up -d
+#   Load a tarball:            gunzip -c lifetime-journal-*.tar.gz | docker load && docker compose up -d
 services:
-  lifetime-calendar:
-    image: ${IMAGE:-ghcr.io/joelwilsonmt/lifetime-calendar}:${VERSION:-latest}
+  lifetime-journal:
+    image: ${IMAGE:-ghcr.io/joelwilsonmt/lifetime-journal}:${VERSION:-latest}
     build:
       context: .
       args:
         VERSION: ${VERSION:-latest}
-    container_name: lifetime-calendar
+    container_name: lifetime-journal
     restart: unless-stopped
     # Run as the owner of ./data so files stay readable on the host
     # (restic, Obsidian, you).

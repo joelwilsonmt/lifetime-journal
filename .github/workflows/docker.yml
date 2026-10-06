@@ -46,7 +46,7 @@ jobs:
           context: .
           platforms: linux/amd64
           load: true
-          tags: lifetime-calendar:ci
+          tags: lifetime-journal:ci
           build-args: VERSION=${{ steps.meta.outputs.version }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
@@ -57,7 +57,7 @@ jobs:
           sudo chown 1000:1000 data
           docker run -d --name lc -p 3075:3000 -v "$PWD/data:/data" \
             --read-only --tmpfs /tmp --security-opt no-new-privileges:true \
-            lifetime-calendar:ci
+            lifetime-journal:ci
           status=starting
           for _ in $(seq 1 30); do
             status="$(docker inspect -f '{{.State.Health.Status}}' lc)"

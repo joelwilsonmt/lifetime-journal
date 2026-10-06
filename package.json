@@ -1,5 +1,5 @@
 {
-  "name": "lifetime-calendar",
+  "name": "lifetime-journal",
   "version": "1.0.0",
   "private": true,
   "license": "MIT",
@@ -25,7 +25,8 @@
     "test": "vitest run",
     "check": "biome check .",
     "format": "biome check --write .",
-    "test:e2e": "pnpm build && playwright test"
+    "test:e2e": "pnpm build && playwright test",
+    "screenshots": "node scripts/screenshots.ts"
   },
   "dependencies": {
     "@hono/node-server": "^2.1.3",
